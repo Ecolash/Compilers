@@ -1,0 +1,16 @@
+a := 5
+b := 5
+c := 35
+Stand alone expression E = 3150
+a := 2
+b := 9
+Stand alone expression E = 5
+tmp := 9
+b := 43
+a := 9
+Stand alone expression E = 5
+tmp := 43
+b := 206
+a := 43
+Stand alone expression E = 5
+d := 1992

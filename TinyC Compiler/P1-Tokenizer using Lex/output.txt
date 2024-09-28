@@ -1,0 +1,724 @@
+
+
+<SINGLE_LINE_COMM, 1000, // TEST FILE FOR TESTING TINY-C LEXICAL ANALYZER>
+
+
+<MULTI_LINE_COMM, 1001, /* ======================================================
+    TEST FILE : GROUP - 54
+    -------------------------
+    TUHIN MONDAL (22CS10087)
+    DIGANTA MANDAL (22CS30062)
+*/>
+
+
+<HASH, 444, #>
+<IDENTIFIER, include>
+<LST, 420, <>
+<IDENTIFIER, stdio>
+<DOT, 406, .>
+<IDENTIFIER, h>
+<GRT, 421, >>
+
+
+<HASH, 444, #>
+<IDENTIFIER, include>
+<LST, 420, <>
+<IDENTIFIER, stdlib>
+<DOT, 406, .>
+<IDENTIFIER, h>
+<GRT, 421, >>
+
+
+<HASH, 444, #>
+<IDENTIFIER, include>
+<LST, 420, <>
+<IDENTIFIER, string>
+<DOT, 406, .>
+<IDENTIFIER, h>
+<GRT, 421, >>
+
+
+<HASH, 444, #>
+<IDENTIFIER, include>
+<LST, 420, <>
+<IDENTIFIER, ctype>
+<DOT, 406, .>
+<IDENTIFIER, h>
+<GRT, 421, >>
+
+
+<HASH, 444, #>
+<IDENTIFIER, include>
+<LST, 420, <>
+<IDENTIFIER, stddef>
+<DOT, 406, .>
+<IDENTIFIER, h>
+<GRT, 421, >>
+
+
+<INT, 229, int>
+<IDENTIFIER, global_var>
+<ASSIGN, 432, =>
+<INTEGER_CONSTANT, 45>
+<SEMICOLON, 430, ;>
+
+
+<INT, 229, int>
+<IDENTIFIER, main>
+<RORBROPEN, 402, (>
+<RORBRCLOSE, 403, )>
+
+
+<CURBROPEN, 404, {>
+
+
+<AUTO, 200, auto>
+<INT, 229, int>
+<IDENTIFIER, a>
+<ASSIGN, 432, =>
+<INTEGER_CONSTANT, 10>
+<SEMICOLON, 430, ;>
+
+
+<STATIC, 222, static>
+<FLOAT, 209, float>
+<IDENTIFIER, b>
+<ASSIGN, 432, =>
+<FLOATING_CONSTANT, 3.14>
+<SEMICOLON, 430, ;>
+
+
+<CONST, 216, const>
+<CHAR, 212, char>
+<IDENTIFIER, c>
+<ASSIGN, 432, =>
+<CHARACTER_CONSTANT, 'X'>
+<SEMICOLON, 430, ;>
+
+
+<VOLATILE, 211, volatile>
+<INT, 229, int>
+<IDENTIFIER, v>
+<ASSIGN, 432, =>
+<INTEGER_CONSTANT, 100>
+<SEMICOLON, 430, ;>
+
+
+<UNSIGNED, 203, unsigned>
+<INT, 229, int>
+<IDENTIFIER, u>
+<ASSIGN, 432, =>
+<INTEGER_CONSTANT, 1>
+<SEMICOLON, 430, ;>
+
+
+<SHORT, 210, short>
+<IDENTIFIER, s>
+<ASSIGN, 432, =>
+<SUB, 413, ->
+<INTEGER_CONSTANT, 1>
+<SEMICOLON, 430, ;>
+
+
+<LONG, 232, long>
+<IDENTIFIER, l>
+<ASSIGN, 432, =>
+<INTEGER_CONSTANT, 9999999>
+<SEMICOLON, 430, ;>
+
+
+<UNSIGNED, 203, unsigned>
+<LONG, 232, long>
+<IDENTIFIER, cf>
+<ASSIGN, 432, =>
+<INTEGER_CONSTANT, 100>
+<SEMICOLON, 430, ;>
+
+
+<TYPEDEF, 233, typedef>
+<STRUCT, 226, struct>
+<CURBROPEN, 404, {>
+
+
+<INT, 229, int>
+<IDENTIFIER, x>
+<SEMICOLON, 430, ;>
+
+
+<INT, 229, int>
+<IDENTIFIER, y>
+<SEMICOLON, 430, ;>
+
+
+<CURBRCLOSE, 405, }>
+<IDENTIFIER, Point>
+<SEMICOLON, 430, ;>
+
+
+<STRUCT, 226, struct>
+<IDENTIFIER, Student>
+<CURBROPEN, 404, {>
+
+
+<CHAR, 212, char>
+<IDENTIFIER, name>
+<SQRBROPEN, 400, [>
+<INTEGER_CONSTANT, 50>
+<SQRBRCLOSE, 401, ]>
+<SEMICOLON, 430, ;>
+
+
+<INT, 229, int>
+<IDENTIFIER, roll_no>
+<SEMICOLON, 430, ;>
+
+
+<CURBRCLOSE, 405, }>
+<SEMICOLON, 430, ;>
+
+
+<UNION, 236, union>
+<IDENTIFIER, Data>
+<CURBROPEN, 404, {>
+
+
+<INT, 229, int>
+<IDENTIFIER, i>
+<SEMICOLON, 430, ;>
+
+
+<FLOAT, 209, float>
+<IDENTIFIER, f>
+<SEMICOLON, 430, ;>
+
+
+<CHAR, 212, char>
+<IDENTIFIER, str>
+<SQRBROPEN, 400, [>
+<INTEGER_CONSTANT, 20>
+<SQRBRCLOSE, 401, ]>
+<SEMICOLON, 430, ;>
+
+
+<CURBRCLOSE, 405, }>
+<IDENTIFIER, data>
+<SEMICOLON, 430, ;>
+
+
+<IDENTIFIER, Point>
+<IDENTIFIER, p1>
+<ASSIGN, 432, =>
+<CURBROPEN, 404, {>
+<INTEGER_CONSTANT, 1>
+<COMMA, 443, ,>
+<INTEGER_CONSTANT, 2>
+<CURBRCLOSE, 405, }>
+<SEMICOLON, 430, ;>
+
+
+<STRUCT, 226, struct>
+<IDENTIFIER, Student>
+<IDENTIFIER, stud1>
+<ASSIGN, 432, =>
+<CURBROPEN, 404, {>
+<STRING_LITERAL, "Nihut">
+<COMMA, 443, ,>
+<INTEGER_CONSTANT, 10087>
+<CURBRCLOSE, 405, }>
+<SEMICOLON, 430, ;>
+
+
+<STRUCT, 226, struct>
+<IDENTIFIER, Student>
+<IDENTIFIER, stud2>
+<ASSIGN, 432, =>
+<CURBROPEN, 404, {>
+<STRING_LITERAL, "Atnagid">
+<COMMA, 443, ,>
+<INTEGER_CONSTANT, 30062>
+<CURBRCLOSE, 405, }>
+<SEMICOLON, 430, ;>
+
+
+<IDENTIFIER, data>
+<DOT, 406, .>
+<IDENTIFIER, i>
+<ASSIGN, 432, =>
+<INTEGER_CONSTANT, 10>
+<SEMICOLON, 430, ;>
+
+
+<DOUBLE, 231, double>
+<IDENTIFIER, complex_num>
+<ASSIGN, 432, =>
+<FLOATING_CONSTANT, 5.1234E3>
+<SEMICOLON, 430, ;>
+
+
+<IF, 221, if>
+<RORBROPEN, 402, (>
+<IDENTIFIER, a>
+<GRT, 421, >>
+<IDENTIFIER, b>
+<AND, 426, &&>
+<IDENTIFIER, u>
+<OR, 427, ||>
+<IDENTIFIER, v>
+<NEQ, 425, !=>
+<INTEGER_CONSTANT, 0>
+<RORBRCLOSE, 403, )>
+<CURBROPEN, 404, {>
+
+
+<FOR, 213, for>
+<RORBROPEN, 402, (>
+<INT, 229, int>
+<IDENTIFIER, i>
+<ASSIGN, 432, =>
+<INTEGER_CONSTANT, 0>
+<SEMICOLON, 430, ;>
+<IDENTIFIER, i>
+<LST, 420, <>
+<INTEGER_CONSTANT, 10>
+<SEMICOLON, 430, ;>
+<IDENTIFIER, i>
+<INCRM, 408, ++>
+<RORBRCLOSE, 403, )>
+<CURBROPEN, 404, {>
+
+
+<IDENTIFIER, a>
+<PLUSEQ, 436, +=>
+<IDENTIFIER, i>
+<SEMICOLON, 430, ;>
+
+
+<CURBRCLOSE, 405, }>
+
+
+<CURBRCLOSE, 405, }>
+<ELSE, 234, else>
+<IF, 221, if>
+<RORBROPEN, 402, (>
+<IDENTIFIER, a>
+<EQL, 424, ==>
+<IDENTIFIER, b>
+<RORBRCLOSE, 403, )>
+<CURBROPEN, 404, {>
+
+
+<GOTO, 217, goto>
+<IDENTIFIER, label>
+<SEMICOLON, 430, ;>
+
+
+<CURBRCLOSE, 405, }>
+<ELSE, 234, else>
+<CURBROPEN, 404, {>
+
+
+<DO, 228, do>
+<CURBROPEN, 404, {>
+
+
+<IDENTIFIER, a>
+<DECRM, 409, -->
+<SEMICOLON, 430, ;>
+
+
+<CURBRCLOSE, 405, }>
+<WHILE, 215, while>
+<RORBROPEN, 402, (>
+<IDENTIFIER, a>
+<GRT, 421, >>
+<INTEGER_CONSTANT, 0>
+<RORBRCLOSE, 403, )>
+<SEMICOLON, 430, ;>
+
+
+<CURBRCLOSE, 405, }>
+
+
+<IDENTIFIER, label>
+<COLON, 429, :>
+
+
+<SWITCH, 230, switch>
+<RORBROPEN, 402, (>
+<IDENTIFIER, a>
+<RORBRCLOSE, 403, )>
+<CURBROPEN, 404, {>
+
+
+<CASE, 208, case>
+<INTEGER_CONSTANT, 1>
+<COLON, 429, :>
+
+
+<BREAK, 204, break>
+<SEMICOLON, 430, ;>
+
+
+<CASE, 208, case>
+<INTEGER_CONSTANT, 2>
+<COLON, 429, :>
+
+
+<BREAK, 204, break>
+<SEMICOLON, 430, ;>
+
+
+<DEFAULT, 224, default>
+<COLON, 429, :>
+
+
+<RETURN, 206, return>
+<INTEGER_CONSTANT, 0>
+<SEMICOLON, 430, ;>
+
+
+<CURBRCLOSE, 405, }>
+
+
+<DOUBLE, 231, double>
+<IDENTIFIER, x>
+<ASSIGN, 432, =>
+<RORBROPEN, 402, (>
+<DOUBLE, 231, double>
+<RORBRCLOSE, 403, )>
+<IDENTIFIER, a>
+<SEMICOLON, 430, ;>
+
+
+<EXTERN, 205, extern>
+<INT, 229, int>
+<IDENTIFIER, external_var>
+<SEMICOLON, 430, ;>
+
+
+<REGISTER, 235, register>
+<INT, 229, int>
+<IDENTIFIER, fast_var>
+<ASSIGN, 432, =>
+<INTEGER_CONSTANT, 50>
+<SEMICOLON, 430, ;>
+
+
+<IDENTIFIER, size_t>
+<IDENTIFIER, size>
+<ASSIGN, 432, =>
+<SIZEOF, 218, sizeof>
+<RORBROPEN, 402, (>
+<IDENTIFIER, stud1>
+<RORBRCLOSE, 403, )>
+<SEMICOLON, 430, ;>
+
+
+<IDENTIFIER, printf>
+<RORBROPEN, 402, (>
+<STRING_LITERAL, "Size of struct Student: %zu\n">
+<COMMA, 443, ,>
+<IDENTIFIER, size>
+<RORBRCLOSE, 403, )>
+<SEMICOLON, 430, ;>
+
+
+<INT, 229, int>
+<MUL, 411, *>
+<IDENTIFIER, ptr>
+<ASSIGN, 432, =>
+<AMPSND, 410, &>
+<IDENTIFIER, a>
+<SEMICOLON, 430, ;>
+
+
+<IDENTIFIER, a>
+<ASSIGN, 432, =>
+<RORBROPEN, 402, (>
+<IDENTIFIER, b>
+<ADD, 412, +>
+<IDENTIFIER, c>
+<RORBRCLOSE, 403, )>
+<MUL, 411, *>
+<IDENTIFIER, s>
+<SUB, 413, ->
+<IDENTIFIER, u>
+<DIV, 416, />
+<IDENTIFIER, l>
+<SEMICOLON, 430, ;>
+
+
+<IDENTIFIER, b>
+<INCRM, 408, ++>
+<SEMICOLON, 430, ;>
+
+
+<IDENTIFIER, b>
+<DECRM, 409, -->
+<SEMICOLON, 430, ;>
+
+
+<IDENTIFIER, cf>
+<SHLEQ, 438, <<=>
+<INTEGER_CONSTANT, 1>
+<SEMICOLON, 430, ;>
+
+
+<IDENTIFIER, a>
+<BINANDEQ, 440, &=>
+<RORBROPEN, 402, (>
+<INTEGER_CONSTANT, 1>
+<SHL, 418, <<>
+<INTEGER_CONSTANT, 5>
+<RORBRCLOSE, 403, )>
+<SEMICOLON, 430, ;>
+
+
+<IDENTIFIER, u>
+<BINOREQ, 442, |=>
+<INTEGER_CONSTANT, 64>
+<SEMICOLON, 430, ;>
+
+
+<IDENTIFIER, a>
+<BINXOREQ, 441, ^=>
+<INTEGER_CONSTANT, 45>
+<SEMICOLON, 430, ;>
+
+
+<IDENTIFIER, cf>
+<MODEQ, 435, %=>
+<INTEGER_CONSTANT, 2>
+<SEMICOLON, 430, ;>
+
+
+<IDENTIFIER, a>
+<ASSIGN, 432, =>
+<NEG, 414, ~>
+<IDENTIFIER, a>
+<SEMICOLON, 430, ;>
+
+
+<IDENTIFIER, a>
+<ASSIGN, 432, =>
+<RORBROPEN, 402, (>
+<IDENTIFIER, a>
+<GRT, 421, >>
+<INTEGER_CONSTANT, 0>
+<RORBRCLOSE, 403, )>
+<QUESTION, 428, ?>
+<INTEGER_CONSTANT, 1>
+<COLON, 429, :>
+<INTEGER_CONSTANT, 0>
+<SEMICOLON, 430, ;>
+
+
+<INT, 229, int>
+<IDENTIFIER, comp>
+<ASSIGN, 432, =>
+<EXCLAIM, 415, !>
+<RORBROPEN, 402, (>
+<IDENTIFIER, a>
+<EQL, 424, ==>
+<IDENTIFIER, b>
+<RORBRCLOSE, 403, )>
+<AND, 426, &&>
+<RORBROPEN, 402, (>
+<IDENTIFIER, s>
+<LTE, 422, <=>
+<IDENTIFIER, l>
+<RORBRCLOSE, 403, )>
+<SEMICOLON, 430, ;>
+
+
+<IDENTIFIER, printf>
+<RORBROPEN, 402, (>
+<STRING_LITERAL, "Result: %d\n">
+<COMMA, 443, ,>
+<IDENTIFIER, a>
+<RORBRCLOSE, 403, )>
+<SEMICOLON, 430, ;>
+
+
+<IDENTIFIER, printf>
+<RORBROPEN, 402, (>
+<STRING_LITERAL, "Result: %d\n">
+<COMMA, 443, ,>
+<IDENTIFIER, b>
+<RORBRCLOSE, 403, )>
+<SEMICOLON, 430, ;>
+
+
+<IDENTIFIER, printf>
+<RORBROPEN, 402, (>
+<STRING_LITERAL, "Result: %d\n">
+<COMMA, 443, ,>
+<IDENTIFIER, c>
+<RORBRCLOSE, 403, )>
+<SEMICOLON, 430, ;>
+
+
+<IDENTIFIER, printf>
+<RORBROPEN, 402, (>
+<STRING_LITERAL, "Result: %d\n">
+<COMMA, 443, ,>
+<IDENTIFIER, v>
+<RORBRCLOSE, 403, )>
+<SEMICOLON, 430, ;>
+
+
+<MUL, 411, *>
+<IDENTIFIER, ptr>
+<ASSIGN, 432, =>
+<INTEGER_CONSTANT, 20>
+<SEMICOLON, 430, ;>
+
+
+<RETURN, 206, return>
+<INTEGER_CONSTANT, 0>
+<SEMICOLON, 430, ;>
+
+
+<CURBRCLOSE, 405, }>
+
+					==========================SYMBOL TABLE==========================
+
+Keyword Table:
+Keyword: int
+Keyword: int
+Keyword: auto
+Keyword: int
+Keyword: static
+Keyword: float
+Keyword: const
+Keyword: char
+Keyword: volatile
+Keyword: int
+Keyword: unsigned
+Keyword: int
+Keyword: short
+Keyword: long
+Keyword: unsigned
+Keyword: long
+Keyword: typedef
+Keyword: struct
+Keyword: int
+Keyword: int
+Keyword: struct
+Keyword: char
+Keyword: int
+Keyword: union
+Keyword: int
+Keyword: float
+Keyword: char
+Keyword: struct
+Keyword: struct
+Keyword: double
+Keyword: if
+Keyword: for
+Keyword: int
+Keyword: else
+Keyword: if
+Keyword: goto
+Keyword: else
+Keyword: do
+Keyword: while
+Keyword: switch
+Keyword: case
+Keyword: break
+Keyword: case
+Keyword: break
+Keyword: default
+Keyword: return
+Keyword: double
+Keyword: double
+Keyword: extern
+Keyword: int
+Keyword: register
+Keyword: int
+Keyword: sizeof
+Keyword: int
+Keyword: int
+Keyword: return
+
+Identifier Table:
+Identifier: include
+Identifier: stdio
+Identifier: h
+Identifier: stdlib
+Identifier: string
+Identifier: ctype
+Identifier: stddef
+Identifier: global_var
+Identifier: main
+Identifier: a
+Identifier: b
+Identifier: c
+Identifier: v
+Identifier: u
+Identifier: s
+Identifier: l
+Identifier: cf
+Identifier: x
+Identifier: y
+Identifier: Point
+Identifier: Student
+Identifier: name
+Identifier: roll_no
+Identifier: Data
+Identifier: i
+Identifier: f
+Identifier: str
+Identifier: data
+Identifier: p1
+Identifier: stud1
+Identifier: stud2
+Identifier: complex_num
+Identifier: label
+Identifier: external_var
+Identifier: fast_var
+Identifier: size_t
+Identifier: size
+Identifier: printf
+Identifier: ptr
+Identifier: comp
+
+Constant Table:
+Integer: 45
+Integer: 10
+Float: 3.140000
+Char: X
+Integer: 100
+Integer: 1
+Integer: 1
+Integer: 9999999
+Integer: 100
+Integer: 50
+Integer: 20
+Integer: 1
+Integer: 2
+Integer: 10087
+Integer: 30062
+Integer: 10
+Float: 5123.399902
+Integer: 10
+Integer: 1
+Integer: 2
+Integer: 50
+Integer: 1
+Integer: 1
+Integer: 5
+Integer: 64
+Integer: 45
+Integer: 2
+Integer: 1
+Integer: 20
+
+String Literal Table:
+String Literal: "Nihut"
+String Literal: "Atnagid"
+String Literal: "Size of struct Student: %zu\n"
+String Literal: "Result: %d\n"
+String Literal: "Result: %d\n"
+String Literal: "Result: %d\n"
+String Literal: "Result: %d\n"
