@@ -1,11 +1,9 @@
 // TEST FILE FOR TESTING TINY-C YACC PARSER
 
-/* ======================================================
-    TEST FILE : GROUP - 54
-    -------------------------
-    TUHIN MONDAL (22CS10087)
-    DIGANTA MANDAL (22CS30062)
-    ----------------------------
+/* ============================================================
+    TEST FILE 3.0 
+    This is a test file for testing the tiny-c yacc parser.
+   ============================================================
 */
 
 int x, *y, z = 10, w = 0;
@@ -15,16 +13,27 @@ void *c;
 
 void fnc0(int arr[][6][7], int n)
 {
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < n; ++i)
     {
         for (int j = 0; j < 6; j++)
-        for (int k = 0; k < 7; k++)
+        for (int k = 0; k < 7; ++k)
         {
             arr[i][j][k] = i + j + k;
             printf("%d ", arr[i][j][k]);
         }
     }
 }
+
+inline int fnc1(char *p1, const int p2, volatile int p3, int *restrict p4,...)
+{
+    auto int a;
+    register int b;
+    extern int exvar;
+    static int d = 4;
+    return d;
+}
+
+const char *fnc2(int b[const static 8], int c[static 9], int d[], int e[const * ]);
 
 char* reverse(char *str, int n);
 
@@ -35,7 +44,7 @@ int fib(int n)
     return x;
 }
 
-int fnc1(float a, int b, char c)
+int fnc4(float a, int b, char c)
 {
     int d = a + b - b / 2;
     printf("c = %c, d = %d\n", c, d);
@@ -56,12 +65,26 @@ void sort(float arr[], int n)
 
 int main()
 {
-    int a = 10, b = 20, c = 30;
-    int d = fnc1(a, b, 'a');
+    int a = 10, b = 20, c = 30, n;
+    int d = fnc4(a, b, 'a');
     int e = fib(10);
+    foo1(a, b, c, d, e, 1, 5.0, 'a', "Happy");
+    ptr1.a = 6, ptr1->b = 'd';
+    node->left->left->right->val = 0;
 
     printf("%d = %d + %d\n", fib(9), fib(8), fib(7));
     printf("a = %d, b = %d, d = %d\n", a, b, d);
+    for (;;)
+        for (int i;;)
+            for (int i = 0, j = 1; i != j; i++)
+            {
+                if (j == 1) continue;
+                else if (j == 2) j = 6;
+
+                if (j == 6) printf("Hi!");
+                if (j == 7) break;
+                else goto end;
+            }
 
     int arr[4][6][7];
     fnc0(arr, 4);
@@ -102,12 +125,24 @@ int main()
         default: printf("P");
     }
 
+    RND_LOC:
+        if (x < y) n = (z == 0) ? 1 : z - 1;
+        else if (x > y) 
+        {
+            if (z >= w) w++;
+            else if (z <= w) z++;
+        }
+
+    while (z--) goto RND_LOC;
+
     char str1[100] = "Hello, ", str2[] = "World!";
     int i = 0, j = 0;
     while (str1[i]) i++;
     while (str2[j]) str1[i++] = str2[j++];
     str1[i] = '\0';
     printf("%s\n", str1);
+
+    end:
     return 0;
 }
 
