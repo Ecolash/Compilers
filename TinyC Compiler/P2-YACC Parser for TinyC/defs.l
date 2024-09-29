@@ -1,8 +1,8 @@
+
 %{
     #include <stdio.h>
     #include "defs.tab.h"
 %}
-
 /* Comments */
 SINGLE_LINE_COMM           "//".*
 SEQUENCE                   [^*]|[*][^/]
@@ -10,17 +10,17 @@ MULTI_LINE_COMM            [/][*]{SEQUENCE}*[*][/]
 IDENTIFIER                 [a-zA-Z_][a-zA-Z0-9_]*
 DIGIT                      [0-9]
 INTEGER_CONSTANT           [1-9]{DIGIT}*|0
-FLOATING_CONST		       (((([0-9]+)?\.[0-9]+)|([0-9]+\.))([eE][+-]?[0-9]+)?)|([0-9]+[eE][+-]?[0-9]+)
-ESCAPE_SEQUENCE		       \\['"?\\abfnrtv]
-C_CHAR				       [^'\\\n]|{ESCAPE_SEQUENCE}
-C_CHAR_SEQUENCE		       {C_CHAR}+
-CHARACTER_CONST		       \'{C_CHAR_SEQUENCE}\'
-CONSTANT                   {INTEGER_CONSTANT}|{FLOATING_CONST}|{CHARACTER_CONST}
-PUNCTUATOR			       "["|"]"|"."|"&"|"*"|"+"|"-"|"~"|"!"|"/"|"("|")"|"{"|"}"|"%"|","|"<"|">"|"^"|"|"|"="|"?"|":"|";"|"#"
-S_CHAR				       [^"\\\n]|{ESCAPE_SEQUENCE}
-S_CHAR_SEQUENCE		       {S_CHAR}+
-STRING_LITERAL	           \"{S_CHAR_SEQUENCE}?\"
-WS 					        [ \t\n]
+FLOATING_CONST             (((([0-9]+)?\.[0-9]+)|([0-9]+\.))([eE][+-]?[0-9]+)?)|([0-9]+[eE][+-]?[0-9]+)
+ESCAPE_SEQUENCE            \\['"?\\abfnrtv0]
+C_CHAR                     [^'\\\n]|{ESCAPE_SEQUENCE}
+C_CHAR_SEQUENCE            {C_CHAR}+
+CHARACTER_CONST            \'{C_CHAR_SEQUENCE}\' 
+PUNCTUATOR                 "["|"]"|"."|"&"|"*"|"+"|"-"|"~"|"!"|"/"|"("|")"|"{"|"}"|"%"|","|"<"|">"|"^"|"|"|"="|"?"|":"|";"|"#"
+S_CHAR                     [^"\\\n]|{ESCAPE_SEQUENCE}
+S_CHAR_SEQUENCE            {S_CHAR}+
+STRING_LITERAL             \"{S_CHAR_SEQUENCE}?\"
+WS                         [ \t\n]
+
 %%
 
 "->"            { return PTR_OP; }
@@ -33,8 +33,8 @@ WS 					        [ \t\n]
 ">="            { return GE_OP; }
 "=="            { return EQ_OP; }
 "!="            { return NE_OP; }
-"&&"             { return BINARY_AND; }
-"||"             { return BINARY_OR; }
+"&&"            { return BINARY_AND; }
+"||"            { return BINARY_OR; }
 "*="            { return MUL_ASSIGN; }
 "/="            { return DIV_ASSIGN; }
 "%="            { return MOD_ASSIGN; }
@@ -79,18 +79,18 @@ WS 					        [ \t\n]
 "break"         { return BREAK; }
 "return"        { return RETURN; }
 
-{IDENTIFIER}            { return IDENTIFIER;}
-{INTEGER_CONSTANT}      { return INTEGER_VAL;}
-{FLOATING_CONST}        { return FLOAT_VAL;}
-{CHARACTER_CONST}       { return CHAR_VAL;}
-{STRING_LITERAL}        { return STRING;}
-{PUNCTUATOR}            { return yytext[0];}
-{SINGLE_LINE_COMM}      {;}
-{MULTI_LINE_COMM}       {;}
-{WS}                    {;}
+{IDENTIFIER}            { yylval.string = strdup(yytext); return IDENTIFIER; }
+{INTEGER_CONSTANT}      { yylval.num = atoi(yytext); return INTEGER_VAL; }
+{FLOATING_CONST}        { yylval.decimal_num = atof(yytext); return FLOAT_VAL; }
+{CHARACTER_CONST}       { yylval.character = yytext[0]; return CHAR_VAL; }
+{STRING_LITERAL}        { yylval.string = strdup(yytext); return STRING; }
+{PUNCTUATOR}            { return yytext[0]; }
+{SINGLE_LINE_COMM}      { /* Ignore single line comments */ }
+{MULTI_LINE_COMM}       { /* Ignore multi-line comments */ }
+{WS}                    { /* Ignore whitespace */ }
 
 %%
 
-int yywrap(void){
+int yywrap(void) {
     return 1;
 }
