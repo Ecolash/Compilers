@@ -30,10 +30,10 @@ typedef struct Attributes
 {
     union 
     {
-        char inh_sign;
-        int inh_val;
-    } inh_par;
-    long long syn_val;
+        char sign;
+        int val;
+    } inh;
+    long long val;
 } ATT;
 
 typedef struct Node
@@ -51,10 +51,10 @@ NodePtr createNode(char name)
 {
     NodePtr node = (NodePtr)malloc(sizeof(Node));
     node->type = name;
-    node->attributes.syn_val = (isdigit(name)) ? name - '0' : 0;
-    if (node->type  == '+') node->attributes.inh_par.inh_sign = '+';
-    if (node->type  == '-') node->attributes.inh_par.inh_sign = '-';
-    if (node->type  == '^') node->attributes.inh_par.inh_sign = '^';
+    node->attributes.val = (isdigit(name)) ? name - '0' : 0;
+    if (node->type  == '+') node->attributes.inh.sign = '+';
+    if (node->type  == '-') node->attributes.inh.sign = '-';
+    if (node->type  == '^') node->attributes.inh.sign = '^';
 
     node->children = NULL;
     node->cap = 0;
@@ -102,11 +102,11 @@ void printAnnotatedTree(NodePtr node, int d, int f, int* markers) {
     char *str = (char *)malloc(1000 * sizeof(char));
 
     char t = node->type;
-    if (t == 'P') sprintf(str, "inh = %c", node->attributes.inh_par.inh_sign);
-    else if (t == 'T') sprintf(str, "inh = %c", node->attributes.inh_par.inh_sign);
-    else if (t == 'N') sprintf(str, "val = %lld", node->attributes.syn_val);
-    else if (t == 'M') sprintf(str, "inh = %d, val = %lld", node->attributes.inh_par.inh_val, node->attributes.syn_val);
-    else if (isdigit(t)) sprintf(str, "val = %lld", node->attributes.syn_val);
+    if (t == 'P') sprintf(str, "inh = %c", node->attributes.inh.sign);
+    else if (t == 'T') sprintf(str, "inh = %c", node->attributes.inh.sign);
+    else if (t == 'N') sprintf(str, "val = %lld", node->attributes.val);
+    else if (t == 'M') sprintf(str, "inh = %d, val = %lld", node->attributes.inh.val, node->attributes.val);
+    else if (isdigit(t)) sprintf(str, "val = %lld", node->attributes.val);
 
     printf("%c [%s]\n", node->type, str);
     if (node->size == 0) return;
@@ -123,14 +123,14 @@ void setAttr(NodePtr node)
         {
             NodePtr P = node->children[0];
             if(P->type != 'P') exit(EXIT_FAILURE);
-            P->attributes.inh_par.inh_sign = '+';
+            P->attributes.inh.sign = '+';
         }
         else
         {
             NodePtr sign = node->children[0];
             NodePtr P = node->children[1];    
             if(P->type != 'P' || ((sign->type != '+') && (sign->type != '-'))) exit(EXIT_FAILURE);
-            P->attributes.inh_par.inh_sign = sign->attributes.inh_par.inh_sign;
+            P->attributes.inh.sign = sign->attributes.inh.sign;
         }
     }
 
@@ -140,7 +140,7 @@ void setAttr(NodePtr node)
         {
             NodePtr T = node->children[0];
             if(T->type != 'T') exit(EXIT_FAILURE);
-            T->attributes.inh_par.inh_sign = node->attributes.inh_par.inh_sign;
+            T->attributes.inh.sign = node->attributes.inh.sign;
         }
         else if(node->size == 3)
         {
@@ -149,8 +149,8 @@ void setAttr(NodePtr node)
             NodePtr P = node->children[2];
 
             if(P->type != 'P' || T->type != 'T' || ((sign->type != '+') && (sign->type != '-'))) exit(EXIT_FAILURE);
-            T->attributes.inh_par.inh_sign = node->attributes.inh_par.inh_sign;
-            P->attributes.inh_par.inh_sign = sign->attributes.inh_par.inh_sign;
+            T->attributes.inh.sign = node->attributes.inh.sign;
+            P->attributes.inh.sign = sign->attributes.inh.sign;
         }
     }
 
@@ -162,8 +162,8 @@ void setAttr(NodePtr node)
             NodePtr M = node->children[1];
             if(M->type != 'M' || !(isdigit(num->type))) exit(EXIT_FAILURE);
             
-            int x = num->attributes.syn_val;
-            M->attributes.inh_par.inh_val = x;
+            int x = num->attributes.val;
+            M->attributes.inh.val = x;
         }
     }
 
@@ -175,8 +175,8 @@ void setAttr(NodePtr node)
             NodePtr M = node->children[1];
             if(M->type != 'M' || !(isdigit(num->type))) exit(EXIT_FAILURE);
 
-            int x = num->attributes.syn_val;
-            M->attributes.inh_par.inh_val = node->attributes.inh_par.inh_val * 10 + x;
+            int x = num->attributes.val;
+            M->attributes.inh.val = node->attributes.inh.val * 10 + x;
         }
     }
 
@@ -188,14 +188,14 @@ void setAttr(NodePtr node)
         {
             NodePtr num = node->children[0];
             if(!(isdigit(num->type))) exit(EXIT_FAILURE);
-            node->attributes.syn_val = num->attributes.syn_val;
+            node->attributes.val = num->attributes.val;
         }
         else
         {
             NodePtr num = node->children[0];
             NodePtr M = node->children[1];
             if(!(isdigit(num->type)) || M->type != 'M') exit(EXIT_FAILURE);
-            node->attributes.syn_val = M->attributes.syn_val;
+            node->attributes.val = M->attributes.val;
         }
     }
 
@@ -205,15 +205,15 @@ void setAttr(NodePtr node)
         {
             NodePtr num = node->children[0];
             if(!(isdigit(num->type))) exit(EXIT_FAILURE);
-            int x = num->attributes.syn_val;
-            node->attributes.syn_val = node->attributes.inh_par.inh_val * 10 + x;
+            int x = num->attributes.val;
+            node->attributes.val = node->attributes.inh.val * 10 + x;
         }
         else
         {
             NodePtr num = node->children[0];
             NodePtr M = node->children[1];
             if(!(isdigit(num->type)) || M->type != 'M') exit(EXIT_FAILURE);
-            node->attributes.syn_val = M->attributes.syn_val;
+            node->attributes.val = M->attributes.val;
         }
     }
 
@@ -238,8 +238,8 @@ long long evalpoly(NodePtr root, int x)
         else if (root->size == 2) P = root->children[1];
         else exit(EXIT_FAILURE);
         
-        root->attributes.syn_val = P->attributes.syn_val;
-        return root->attributes.syn_val;
+        root->attributes.val = P->attributes.val;
+        return root->attributes.val;
     }
 
     if(root->type == 'P')
@@ -250,9 +250,9 @@ long long evalpoly(NodePtr root, int x)
         else if (root->size == 3) T = root->children[0], P = root->children[2];
         else exit(EXIT_FAILURE);
 
-        if(root->size == 1) root->attributes.syn_val = T->attributes.syn_val;
-        else root->attributes.syn_val =  T->attributes.syn_val + P->attributes.syn_val; 
-        return root->attributes.syn_val;
+        if(root->size == 1) root->attributes.val = T->attributes.val;
+        else root->attributes.val =  T->attributes.val + P->attributes.val; 
+        return root->attributes.val;
     }
 
     if(root->type == 'T')
@@ -262,9 +262,9 @@ long long evalpoly(NodePtr root, int x)
         if(root->size == 1) 
         {
             N = root->children[0];
-            if (N->type == '1') root->attributes.syn_val = 1;
-            else if (N->type == 'N') root->attributes.syn_val = N->attributes.syn_val;
-            else if (N->type == 'X') root->attributes.syn_val = N->attributes.syn_val;
+            if (N->type == '1') root->attributes.val = 1;
+            else if (N->type == 'N') root->attributes.val = N->attributes.val;
+            else if (N->type == 'X') root->attributes.val = N->attributes.val;
             else exit(EXIT_FAILURE);
         }
         else if (root->size == 2)
@@ -272,14 +272,14 @@ long long evalpoly(NodePtr root, int x)
             N = root->children[0];
             X = root->children[1];
             if (N->type != 'N' || X->type != 'X') exit(EXIT_FAILURE);
-            long long coeff = N->attributes.syn_val;
-            long long val = X->attributes.syn_val;
-            root->attributes.syn_val = coeff * val;
+            long long coeff = N->attributes.val;
+            long long val = X->attributes.val;
+            root->attributes.val = coeff * val;
         }
         else exit(EXIT_FAILURE);
 
-        root->attributes.syn_val = (root->attributes.inh_par.inh_sign == '+') ? root->attributes.syn_val : -root->attributes.syn_val;
-        return root->attributes.syn_val;
+        root->attributes.val = (root->attributes.inh.sign == '+') ? root->attributes.val : -root->attributes.val;
+        return root->attributes.val;
     }
 
     if(root->type == 'X')
@@ -287,18 +287,18 @@ long long evalpoly(NodePtr root, int x)
         if(root->size == 1) 
         {
             NodePtr num = root->children[0];
-            if(num->type == 'x') root->attributes.syn_val = x;
+            if(num->type == 'x') root->attributes.val = x;
             else exit(EXIT_FAILURE);
         }
         else if(root->size == 3)
         {
             NodePtr num = root->children[0];
             NodePtr X = root->children[2];
-            int power = X->attributes.syn_val;
-            root->attributes.syn_val = binpow(x, power);
+            int power = X->attributes.val;
+            root->attributes.val = binpow(x, power);
         }
         else exit(EXIT_FAILURE);
-        return root->attributes.syn_val;
+        return root->attributes.val;
     }
 
     exit(EXIT_FAILURE);
@@ -320,7 +320,7 @@ void printDerivative(NodePtr root)
     {
         NodePtr N = NULL;
         NodePtr X = NULL;
-        char sign = root->attributes.inh_par.inh_sign;
+        char sign = root->attributes.inh.sign;
 
         if(root->size == 1) 
         {
@@ -331,7 +331,7 @@ void printDerivative(NodePtr root)
             {
                 long long pow = 1;
                 if( N->size == 1) pow = 1;
-                else if(N->size == 3) pow = N->children[2]->attributes.syn_val;
+                else if(N->size == 3) pow = N->children[2]->attributes.val;
                 else exit(EXIT_FAILURE);
 
                 long long coeff = pow;
@@ -353,10 +353,10 @@ void printDerivative(NodePtr root)
             long long pow = 1;
 
             if( X->size == 1) pow = 1;
-            else if(X->size == 3) pow = X->children[2]->attributes.syn_val;
+            else if(X->size == 3) pow = X->children[2]->attributes.val;
             else exit(EXIT_FAILURE);
 
-            long long coeff = N->attributes.syn_val * pow;
+            long long coeff = N->attributes.val * pow;
             long long new_pow = pow - 1;
             if(coeff == 0) return;
 
