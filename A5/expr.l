@@ -3,7 +3,6 @@ NAME - TUHIN MONDAL
 ROLL NUMBER - 22CS10087
 //=========================================*/
 %{
-#include "expr.h"
 #include "y.tab.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,6 +17,7 @@ id      {letter}({others}*)
 
 %%
 "set"          { return SET; }
+{id}           { yylval.id = strdup(yytext); return ID; }
 {num}          { yylval.num = atoi(yytext); return NUM; }
 "("            { return '('; }
 ")"            { return ')'; }
@@ -27,7 +27,6 @@ id      {letter}({others}*)
 "/"            { return '/'; }
 "%"            { return '%'; }
 "**"           { return '^'; }
-{id}           { yylval.id = strdup(yytext); return ID; }
 {space}        { /* ignore whitespace */ }
 .              { /* ignore invalid characters */ }
 %%
