@@ -41,8 +41,9 @@ int get(char* id)
         int found = strcmp(SymbolTable[i].id, id);
         if (found == 0) return SymbolTable[i].offset;
     }
-    fprintf(stderr, "Error: %s not found in Symbol Table\n", id);
-    exit(1);
+    fprintf(stderr, "Warning: %s not initialised before! \n", id);
+    add(id);
+    return get(id);
 }
 
 int main(int argc, char *argv[])

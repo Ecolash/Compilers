@@ -37,6 +37,18 @@ ROLL NUMBER - 22CS10087
         int val;
         int memloc;
     } arg;
+
+    typedef struct expr{
+        int reg;
+        int mem;
+    } expr;
+
+    int temp() {
+        char *temp = (char *)malloc(10);
+        sprintf(temp, "$t%d", ++temp_cnt);
+        add(temp);
+        return get(temp);
+    }
 %}
 
 %union { 
@@ -44,6 +56,7 @@ ROLL NUMBER - 22CS10087
     char* id; 
     int exp; 
     arg info;
+    expr einfo;
 }
 
 //------------------------------------------------
@@ -66,8 +79,8 @@ ROLL NUMBER - 22CS10087
 // LIST OF PRODUCTION RULES & ACTIONS
 //------------------------------------------------
 PROGRAM: 
-    STMT PROGRAM { }
-    | STMT       { }
+    STMT PROGRAM { return 0;}
+    | STMT       { return 0;}
     ;
 
 EXPRSTMT: 
@@ -88,42 +101,144 @@ EXPR:
         if (strcmp($2, "^") == 0) {
             switch (arg1) {
             case 1: switch (arg2) {
-                case 1: fprintf(TAC, "\tR[%d] = pwr(R[0], R[1]);\n", $$ = regP); regP++; break;
-                case 2: fprintf(TAC, "\tR[%d] = pwr(R[0], %d);\n", $$ = regP, $4.val); regP++; break;
-                case 3: fprintf(TAC, "\tR[%d] = pwr(R[0], R[%d]);\n", $$ = $4.val, $4.val); regP = $4.val + 1; break;
+                case 1: 
+                    if (regP < 12) {
+                        fprintf(TAC, "\tR[%d] = pwr(R[0], R[1]);\n", $$ = regP); 
+                        regP++;
+                    } else {
+                        fprintf(TAC, "\tR[0] = pwr(R[0], R[1]);\n");
+                        $$ = temp();
+                        fprintf(TAC, "\tMEM[%d] = R[0];\n", $$);
+                    }
+                    break;
+                case 2: 
+                    if (regP < 12) {
+                        fprintf(TAC, "\tR[%d] = pwr(R[0], %d);\n", $$ = regP, $4.val); 
+                        regP++;
+                    } else {
+                        fprintf(TAC, "\tR[0] = pwr(R[0], %d);\n", $4.val);
+                        $$ = temp();
+                        fprintf(TAC, "\tMEM[%d] = R[0];\n", $$);
+                    }
+                    break;
+                case 3: 
+                    fprintf(TAC, "\tR[%d] = pwr(R[0], R[%d]);\n", $$ = $4.val, $4.val); 
+                    regP = $4.val + 1; 
+                    break;
             }
             break;
             case 2: switch (arg2) {
-                case 1: fprintf(TAC, "\tR[%d] = pwr(%d, R[1]);\n", $$ = regP, $3.val); regP++; break;
-                case 2: fprintf(TAC, "\tR[%d] = pwr(%d, %d);\n", $$ = regP, $3.val, $4.val); regP++; break;
-                case 3: fprintf(TAC, "\tR[%d] = pwr(%d, R[%d]);\n", $$ = $4.val, $3.val, $4.val);  regP = $4.val + 1; break;
+                case 1: 
+                    if (regP < 12) {
+                        fprintf(TAC, "\tR[%d] = pwr(%d, R[1]);\n", $$ = regP, $3.val); 
+                        regP++;
+                    } else {
+                        fprintf(TAC, "\tR[0] = pwr(%d, R[1]);\n", $3.val);
+                        $$ = temp();
+                        fprintf(TAC, "\tMEM[%d] = R[0];\n", $$);
+                    }
+                    break;
+                case 2: 
+                    if (regP < 12) {
+                        fprintf(TAC, "\tR[%d] = pwr(%d, %d);\n", $$ = regP, $3.val, $4.val); 
+                        regP++;
+                    } else {
+                        fprintf(TAC, "\tR[0] = pwr(%d, %d);\n", $3.val, $4.val);
+                        $$ = temp();
+                        fprintf(TAC, "\tMEM[%d] = R[0];\n", $$);
+                    }
+                    break;
+                case 3: 
+                    fprintf(TAC, "\tR[%d] = pwr(%d, R[%d]);\n", $$ = $4.val, $3.val, $4.val);  
+                    regP = $4.val + 1; 
+                    break;
             }
             break;
             case 3: switch (arg2) {
-                case 1: fprintf(TAC, "\tR[%d] = pwr(R[%d], R[1]);\n", $$ = $3.val, $3.val); regP = $3.val + 1; break;
-                case 2: fprintf(TAC, "\tR[%d] = pwr(R[%d], %d);\n", $$ = $3.val, $3.val, $4.val); regP = $3.val + 1; break;
-                case 3: fprintf(TAC, "\tR[%d] = pwr(R[%d], R[%d]);\n", $$ = $3.val, $3.val, $4.val); regP = $3.val + 1; break;
+                case 1: 
+                    fprintf(TAC, "\tR[%d] = pwr(R[%d], R[1]);\n", $$ = $3.val, $3.val); 
+                    regP = $3.val + 1; 
+                    break;
+                case 2: 
+                    fprintf(TAC, "\tR[%d] = pwr(R[%d], %d);\n", $$ = $3.val, $3.val, $4.val); 
+                    regP = $3.val + 1; 
+                    break;
+                case 3: 
+                    fprintf(TAC, "\tR[%d] = pwr(R[%d], R[%d]);\n", $$ = $3.val, $3.val, $4.val); 
+                    regP = $3.val + 1; 
+                    break;
             }
             break;
             }
         } else {
             switch (arg1) {
             case 1: switch (arg2) {
-                case 1: fprintf(TAC, "\tR[%d] = R[0] %s R[1];\n", $$ = regP, $2); regP++; break;
-                case 2: fprintf(TAC, "\tR[%d] = R[0] %s %d;\n", $$ = regP, $2, $4.val); regP++; break;
-                case 3: fprintf(TAC, "\tR[%d] = R[0] %s R[%d];\n", $$ = $4.val, $2, $4.val); regP = $4.val + 1; break;
+                case 1: 
+                    if (regP < 12) {
+                        fprintf(TAC, "\tR[%d] = R[0] %s R[1];\n", $$ = regP, $2); 
+                        regP++;
+                    } else {
+                        fprintf(TAC, "\tR[0] = R[0] %s R[1];\n", $2);
+                        $$ = temp();
+                        fprintf(TAC, "\tMEM[%d] = R[0];\n", $$);
+                    }
+                    break;
+                case 2: 
+                    if (regP < 12) {
+                        fprintf(TAC, "\tR[%d] = R[0] %s %d;\n", $$ = regP, $2, $4.val); 
+                        regP++;
+                    } else {
+                        fprintf(TAC, "\tR[0] = R[0] %s %d;\n", $2, $4.val);
+                        $$ = temp();
+                        fprintf(TAC, "\tMEM[%d] = R[0];\n", $$);
+                    }
+                    break;
+                case 3: 
+                    fprintf(TAC, "\tR[%d] = R[0] %s R[%d];\n", $$ = $4.val, $2, $4.val); 
+                    regP = $4.val + 1; 
+                    break;
             }
             break;
             case 2: switch (arg2) {
-                case 1: fprintf(TAC, "\tR[%d] = %d %s R[1];\n", $$ = regP, $3.val, $2); regP++; break;
-                case 2: fprintf(TAC, "\tR[%d] = %d %s %d;\n", $$ = regP, $3.val, $2, $4.val); regP++; break;
-                case 3: fprintf(TAC, "\tR[%d] = %d %s R[%d];\n", $$ = $4.val, $3.val, $2, $4.val); regP = $4.val + 1; break;
+                case 1: 
+                    if (regP < 12) {
+                        fprintf(TAC, "\tR[%d] = %d %s R[1];\n", $$ = regP, $3.val, $2); 
+                        regP++;
+                    } else {
+                        fprintf(TAC, "\tR[0] = %d %s R[1];\n", $3.val, $2);
+                        $$ = temp();
+                        fprintf(TAC, "\tMEM[%d] = R[0];\n", $$);
+                    }
+                    break;
+                case 2: 
+                    if (regP < 12) {
+                        fprintf(TAC, "\tR[%d] = %d %s %d;\n", $$ = regP, $3.val, $2, $4.val); 
+                        regP++;
+                    } else {
+                        fprintf(TAC, "\tR[0] = %d %s %d;\n", $3.val, $2, $4.val);
+                        $$ = temp();
+                        fprintf(TAC, "\tMEM[%d] = R[0];\n", $$);
+                    }
+                    break;
+                case 3: 
+                    fprintf(TAC, "\tR[%d] = %d %s R[%d];\n", $$ = $4.val, $3.val, $2, $4.val); 
+                    regP = $4.val + 1; 
+                    break;
             }
             break;
             case 3: switch (arg2) {
-                case 1: fprintf(TAC, "\tR[%d] = R[%d] %s R[1];\n", $$ = $3.val, $3.val, $2); regP = $3.val + 1; break;
-                case 2: fprintf(TAC, "\tR[%d] = R[%d] %s %d;\n", $$ = $3.val, $3.val, $2, $4.val); regP = $3.val + 1; break;
-                case 3: fprintf(TAC, "\tR[%d] = R[%d] %s R[%d];\n", $$ = $3.val, $3.val, $2, $4.val); regP = $3.val + 1; break;
+                case 1: 
+                    fprintf(TAC, "\tR[%d] = R[%d] %s R[1];\n", $$ = $3.val, $3.val, $2); 
+                    regP = $3.val + 1; 
+                    break;
+                case 2: 
+                    fprintf(TAC, "\tR[%d] = R[%d] %s %d;\n", $$ = $3.val, $3.val, $2, $4.val); 
+                    regP = $3.val + 1; 
+                    break;
+                case 3: 
+                    fprintf(TAC, "\tR[%d] = R[%d] %s R[%d];\n", $$ = $3.val, $3.val, $2, $4.val); 
+                    regP = $3.val + 1; 
+                    break;
             }
             break;
             }
@@ -131,8 +246,8 @@ EXPR:
     };
 
 STMT: 
-      SETSTMT  { fprintf(TAC, "\tmprn(MEM, %d);\n\n", $1);}
-    | EXPRSTMT { fprintf(TAC, "\teprn(R, %d);\n\n", $1);};
+      SETSTMT  { fprintf(TAC, "\tmprn(MEM, %d);\n", $1);}
+    | EXPRSTMT { fprintf(TAC, "\teprn(R, %d);\n", $1);};
 
 SETSTMT: 
     '(' SET ID NUM ')' 
@@ -177,9 +292,14 @@ ARG:
         $$.val = $1;
     };
     | EXPR 
-    { 
-        $$.type = 3;
-        $$.val = $1;
+    {   if (regP < 12) {
+            $$.type = 3;
+            $$.val = $1;
+        }
+        else {
+            $$.type = 1;
+            $$.memloc = $1;
+        }
     };
 
 OP: 
@@ -191,4 +311,3 @@ OP:
     | '^' { $$ = "^"; };
 
 %% 
-
