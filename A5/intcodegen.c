@@ -11,10 +11,204 @@ extern FILE *yyin;
 extern void yyerror(const char *s);
 
 extern unsigned int size;
-extern unsigned int regP, memP;
+extern unsigned int regP, memP, temp_cnt;
 
 typedef struct node Node;
+typedef struct expr expr;
+typedef struct arg arg;
 extern Node SymbolTable[5000];
+
+
+void gen_expr(int arg1, int arg2, char* op, expr* result, arg arg3, arg arg4) {
+    if (arg1 == 1) fprintf(TAC, "\tR[0] = MEM[%d];\n", arg3.memloc);
+    if (arg2 == 1) fprintf(TAC, "\tR[1] = MEM[%d];\n", arg4.memloc);
+
+    switch (arg1)
+    {
+    case 1:
+        switch (arg2)
+        {
+        case 1:
+            if (regP >= 12)
+            {
+                result->type = 1;
+                result->val = temp();
+                if (strcmp(op, "^") == 0) fprintf(TAC, "\tR[0] = pwr(R[0], R[1]);\n");
+                else fprintf(TAC, "\tR[0] = R[0] %s R[1];\n", op);
+                fprintf(TAC, "\tMEM[%d] = R[0];\n", result->val);
+            }
+            else
+            {
+                result->type = 2;
+                result->val = regP++;
+                if (strcmp(op, "^") == 0) fprintf(TAC, "\tR[%d] = pwr(R[0], R[1]);\n", result->val);
+                else fprintf(TAC, "\tR[%d] = R[0] %s R[1];\n", result->val, op);
+            }
+            break;
+        case 2:
+            if (regP >= 12)
+            {
+                result->type = 1;
+                result->val = temp();
+                if (strcmp(op, "^") == 0) fprintf(TAC, "\tR[0] = pwr(R[0],%d);\n", arg4.val);
+                else fprintf(TAC, "\tR[0] = R[0] %s %d;\n", op, arg4.val);
+                fprintf(TAC, "\tMEM[%d] = R[0];\n", result->val);
+            }
+            else
+            {
+                result->type = 2;
+                result->val = regP++;
+                if (strcmp(op, "^") == 0) fprintf(TAC, "\tR[%d] = pwr(R[0],%d);\n", result->val, arg4.val);
+                else fprintf(TAC, "\tR[%d] = R[0] %s %d;\n", result->val, op, arg4.val);
+            }
+            break;
+        case 3:
+            result->type = 2;
+            result->val = arg4.val;
+            if (strcmp(op, "^") == 0) fprintf(TAC, "\tR[%d] = pwr(R[0], R[%d]);\n", arg4.val, arg4.val);
+            else fprintf(TAC, "\tR[%d] = R[0] %s R[%d];\n", arg4.val, op, arg4.val);
+            regP = arg4.val + 1;
+            break;
+        }
+        break;
+    case 2:
+        switch (arg2)
+        {
+        case 1:
+            if (regP >= 12)
+            {
+                result->type = 1;
+                result->val = temp();
+                if (strcmp(op, "^") == 0) fprintf(TAC, "\tR[0] = pwr(%d, R[1]);\n", arg3.val);
+                else fprintf(TAC, "\tR[0] = %d %s R[1];\n", arg3.val, op);
+                fprintf(TAC, "\tMEM[%d] = R[0];\n", result->val);
+            }
+            else
+            {
+                result->type = 2;
+                result->val = regP++;
+                if (strcmp(op, "^") == 0) fprintf(TAC, "\tR[%d] = pwr(%d, R[1]);\n", result->val, arg3.val);
+                else fprintf(TAC, "\tR[%d] = %d %s R[1];\n", result->val, arg3.val, op);
+            }
+            break;
+        case 2:
+            if (regP >= 12)
+            {
+                result->type = 1;
+                result->val = temp();
+                if (strcmp(op, "^") == 0) fprintf(TAC, "\tR[0] = pwr(%d,%d);\n", arg3.val, arg4.val);
+                else fprintf(TAC, "\tR[0] = %d %s %d;\n", arg3.val, op, arg4.val);
+                fprintf(TAC, "\tMEM[%d] = R[0];\n", result->val);
+            }
+            else
+            {
+                result->type = 2;
+                result->val = regP++;
+                if (strcmp(op, "^") == 0) fprintf(TAC, "\tR[%d] = pwr(%d,%d);\n", result->val, arg3.val, arg4.val);
+                else fprintf(TAC, "\tR[%d] = %d %s %d;\n", result->val, arg3.val, op, arg4.val);
+            }
+            break;
+        case 3:
+            result->type = 2;
+            result->val = arg4.val;
+            if (strcmp(op, "^") == 0)
+                fprintf(TAC, "\tR[%d] = pwr(%d, R[%d]);\n", arg4.val, arg3.val, arg4.val);
+            else
+                fprintf(TAC, "\tR[%d] = %d %s R[%d];\n", arg4.val, arg3.val, op, arg4.val);
+            regP = arg4.val + 1;
+            break;
+        }
+        break;
+    case 3:
+        switch (arg2)
+        {
+        case 1:
+            result->type = 2;
+            result->val = arg3.val;
+            if (strcmp(op, "^") == 0)
+                fprintf(TAC, "\tR[%d] = pwr(R[%d], R[1]);\n", arg3.val, arg3.val);
+            else
+                fprintf(TAC, "\tR[%d] = R[%d] %s R[1];\n", arg3.val, arg3.val, op);
+            regP = arg3.val + 1;
+            break;
+        case 2:
+            result->type = 2;
+            result->val = arg3.val;
+            if (strcmp(op, "^") == 0)
+                fprintf(TAC, "\tR[%d] = pwr(R[%d],%d);\n", arg3.val, arg3.val, arg4.val);
+            else
+                fprintf(TAC, "\tR[%d] = R[%d] %s %d;\n", arg3.val, arg3.val, op, arg4.val);
+            regP = arg3.val + 1;
+            break;
+        case 3:
+            result->type = 2;
+            result->val = arg3.val;
+            if (strcmp(op, "^") == 0)
+                fprintf(TAC, "\tR[%d] = pwr(R[%d], R[%d]);\n", arg3.val, arg3.val, arg4.val);
+            else
+                fprintf(TAC, "\tR[%d] = R[%d] %s R[%d];\n", arg3.val, arg3.val, op, arg4.val);
+            regP = arg3.val + 1;
+            break;
+        }
+        break;
+    }
+}
+
+void set_id_num(char* id, int num, int* result) {
+    update(id);
+    int loc = get(id);
+    fprintf(TAC, "\tMEM[%d] = %d;\n", loc, num);
+    *result = loc;
+}
+
+void set_id_expr(char* id, expr expr_val, int* result) {
+    update(id);
+    int loc = get(id);
+    fprintf(TAC, "\tMEM[%d] = R[%d];\n", loc, expr_val.val);
+    regP = 2;
+    *result = loc;
+}
+
+void set_id_id(char* id1, char* id2, int* result) {
+    update(id1);
+    int loc1 = get(id1);
+    int loc2 = get(id2);
+    fprintf(TAC, "\tR[0] = MEM[%d];\n", loc2);
+    fprintf(TAC, "\tMEM[%d] = R[0];\n", loc1);
+    *result = loc1;
+}
+
+int temp() {
+    char *temp = (char *)malloc(10);
+    sprintf(temp, "$t%d", ++temp_cnt);
+    add(temp);
+    return get(temp);
+}
+
+void set_arg_id(arg* argument, char* id) {
+    int loc = get(id);
+    argument->type = 1;
+    argument->val = -1;
+    argument->memloc = loc;
+}
+
+void set_arg_num(arg* argument, int num) {
+    argument->type = 2;
+    argument->val = num;
+    argument->memloc = -1;
+}
+
+void set_arg_expr(arg* argument, expr expr_val) {
+    if (expr_val.type == 1) {
+        argument->type = 1;
+        argument->val = -1;
+        argument->memloc = expr_val.val;
+    } else if (expr_val.type == 2) {
+        argument->type = 3;
+        argument->val = expr_val.val;
+        argument->memloc = -1;
+    }
+}
 
 void add(char* id)
 {

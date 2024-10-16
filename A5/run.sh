@@ -2,6 +2,7 @@
 
 yacc -d expr.y
 lex expr.l
+rm intcode.c
 gcc intcodegen.c -o icgen
 ./icgen sample.txt
 gcc intcode.c -o ic
