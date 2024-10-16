@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
 
     yyparse();
 
-    fprintf(TAC, "\texit(0);");
+    fprintf(TAC, "\n\texit(0);");
     fprintf(TAC, "\n}\n");
     fclose(yyin);
     fclose(TAC);

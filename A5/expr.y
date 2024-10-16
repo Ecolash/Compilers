@@ -38,9 +38,10 @@ ROLL NUMBER - 22CS10087
         int memloc;
     } arg;
 
-    typedef struct expr{
-        int reg;
-        int mem;
+    typedef struct expr
+    {
+        int type;
+        int val;
     } expr;
 
     int temp() {
@@ -70,7 +71,7 @@ ROLL NUMBER - 22CS10087
 //------------------------------------------------
 %start PROGRAM
 %type<exp> STMT SETSTMT PROGRAM EXPRSTMT
-%type<exp> EXPR
+%type<einfo> EXPR
 %type<info> ARG
 %type<id> OP
 
@@ -79,14 +80,14 @@ ROLL NUMBER - 22CS10087
 // LIST OF PRODUCTION RULES & ACTIONS
 //------------------------------------------------
 PROGRAM: 
-    STMT PROGRAM { return 0;}
-    | STMT       { return 0;}
+    STMT PROGRAM { return 0; }
+    | STMT       { return 0; }
     ;
 
 EXPRSTMT: 
     EXPR 
     { 
-        $$ = $1;
+        $$ = $1.type;
         regP = 2;
     };
 
@@ -98,156 +99,148 @@ EXPR:
         if (arg1 == 1) fprintf(TAC, "\tR[0] = MEM[%d];\n", $3.memloc);
         if (arg2 == 1) fprintf(TAC, "\tR[1] = MEM[%d];\n", $4.memloc);
 
-        if (strcmp($2, "^") == 0) {
+        // if (strcmp($2, "^") == 0) {
             switch (arg1) {
             case 1: switch (arg2) {
-                case 1: 
-                    if (regP < 12) {
-                        fprintf(TAC, "\tR[%d] = pwr(R[0], R[1]);\n", $$ = regP); 
-                        regP++;
-                    } else {
-                        fprintf(TAC, "\tR[0] = pwr(R[0], R[1]);\n");
-                        $$ = temp();
-                        fprintf(TAC, "\tMEM[%d] = R[0];\n", $$);
+                case 1:
+                    if (regP >= 12)
+                    {
+                        $$.type = 1;
+                        $$.val = temp();
+                        if (strcmp($2, "^") == 0) fprintf(TAC, "\tR[0] = pwr(R[0], R[1]);\n");
+                        else fprintf(TAC, "\tR[0] = R[0] %s R[1];\n", $2);
+                        fprintf(TAC, "\tMEM[%d] = R[0];\n", $$.val);
+                    }
+                    else
+                    {
+                        $$.type = 2;
+                        $$.val = regP++;
+                        if (strcmp($2, "^") == 0) fprintf(TAC, "\tR[%d] = pwr(R[0], R[1]);\n", $$.val);
+                        else fprintf(TAC, "\tR[%d] = R[0] %s R[1];\n", $$.val, $2);
                     }
                     break;
                 case 2: 
-                    if (regP < 12) {
-                        fprintf(TAC, "\tR[%d] = pwr(R[0], %d);\n", $$ = regP, $4.val); 
-                        regP++;
-                    } else {
-                        fprintf(TAC, "\tR[0] = pwr(R[0], %d);\n", $4.val);
-                        $$ = temp();
-                        fprintf(TAC, "\tMEM[%d] = R[0];\n", $$);
+                    if (regP >= 12)
+                    {
+                        $$.type = 1;
+                        $$.val = temp();
+                        if (strcmp($2, "^") == 0) fprintf(TAC, "\tR[0] = pwr(R[0],%d);\n", $4.val);
+                        else fprintf(TAC, "\tR[0] = R[0] %s %d;\n", $2, $4.val);
+                        fprintf(TAC, "\tMEM[%d] = R[0];\n", $$.val);
+                    }
+                    else
+                    {
+                        $$.type = 2;
+                        $$.val = regP++;
+                        if (strcmp($2, "^") == 0) fprintf(TAC, "\tR[%d] = pwr(R[0],%d);\n", $$.val, $4.val);
+                        else fprintf(TAC, "\tR[%d] = R[0] %s %d;\n", $$.val, $2, $4.val);
                     }
                     break;
                 case 3: 
-                    fprintf(TAC, "\tR[%d] = pwr(R[0], R[%d]);\n", $$ = $4.val, $4.val); 
-                    regP = $4.val + 1; 
+                    $$.type = 2;
+                    $$.val = $4.val;
+                    if (strcmp($2, "^") == 0) fprintf(TAC, "\tR[%d] = pwr(R[0], R[%d]);\n", $4.val, $4.val);
+                    else fprintf(TAC, "\tR[%d] = R[0] %s R[%d];\n", $4.val, $2, $4.val);
+                    regP = $4.val + 1;
                     break;
             }
             break;
             case 2: switch (arg2) {
                 case 1: 
-                    if (regP < 12) {
-                        fprintf(TAC, "\tR[%d] = pwr(%d, R[1]);\n", $$ = regP, $3.val); 
-                        regP++;
-                    } else {
-                        fprintf(TAC, "\tR[0] = pwr(%d, R[1]);\n", $3.val);
-                        $$ = temp();
-                        fprintf(TAC, "\tMEM[%d] = R[0];\n", $$);
+                    if (regP >= 12)
+                    {
+                        $$.type = 1;
+                        $$.val = temp();
+                        if (strcmp($2, "^") == 0) fprintf(TAC, "\tR[0] = pwr(%d, R[1]);\n", $3.val);
+                        else fprintf(TAC, "\tR[0] = %d %s R[1];\n", $3.val, $2);
+                        fprintf(TAC, "\tMEM[%d] = R[0];\n", $$.val);
+                    }
+                    else
+                    {
+                        $$.type = 2;
+                        $$.val = regP++;
+                        if (strcmp($2, "^") == 0) fprintf(TAC, "\tR[%d] = pwr(%d, R[1]);\n", $$.val, $3.val);
+                        else fprintf(TAC, "\tR[%d] = %d %s R[1];\n", $$.val, $3.val, $2);
                     }
                     break;
                 case 2: 
-                    if (regP < 12) {
-                        fprintf(TAC, "\tR[%d] = pwr(%d, %d);\n", $$ = regP, $3.val, $4.val); 
-                        regP++;
-                    } else {
-                        fprintf(TAC, "\tR[0] = pwr(%d, %d);\n", $3.val, $4.val);
-                        $$ = temp();
-                        fprintf(TAC, "\tMEM[%d] = R[0];\n", $$);
+                    if (regP >= 12)
+                    {
+                        $$.type = 1;
+                        $$.val = temp();
+                        if (strcmp($2, "^") == 0) fprintf(TAC, "\tR[0] = pwr(%d,%d);\n", $3.val, $4.val);
+                        else fprintf(TAC, "\tR[0] = %d %s %d;\n", $3.val, $2, $4.val);
+                        fprintf(TAC, "\tMEM[%d] = R[0];\n", $$.val);
+                    }
+                    else
+                    {
+                        $$.type = 2;
+                        $$.val = regP++;
+                        if (strcmp($2, "^") == 0) fprintf(TAC, "\tR[%d] = pwr(%d,%d);\n", $$.val, $3.val, $4.val);
+                        else fprintf(TAC, "\tR[%d] = %d %s %d;\n", $$.val, $3.val, $2, $4.val);
                     }
                     break;
                 case 3: 
-                    fprintf(TAC, "\tR[%d] = pwr(%d, R[%d]);\n", $$ = $4.val, $3.val, $4.val);  
-                    regP = $4.val + 1; 
+                    $$.type = 2;
+                    $$.val = $4.val;
+                    if (strcmp($2, "^") == 0) fprintf(TAC, "\tR[%d] = pwr(%d, R[%d]);\n", $4.val, $3.val, $4.val);
+                    else fprintf(TAC, "\tR[%d] = %d %s R[%d];\n", $4.val, $3.val, $2, $4.val);
+                    regP = $4.val + 1;
                     break;
             }
             break;
             case 3: switch (arg2) {
                 case 1: 
-                    fprintf(TAC, "\tR[%d] = pwr(R[%d], R[1]);\n", $$ = $3.val, $3.val); 
-                    regP = $3.val + 1; 
+                    $$.type = 2;
+                    $$.val = $3.val;
+                    if (strcmp($2, "^") == 0) fprintf(TAC, "\tR[%d] = pwr(R[%d], R[1]);\n", $3.val, $3.val);
+                    else fprintf(TAC, "\tR[%d] = R[%d] %s R[1];\n", $3.val, $3.val, $2);
+                    regP = $3.val + 1;
                     break;
                 case 2: 
-                    fprintf(TAC, "\tR[%d] = pwr(R[%d], %d);\n", $$ = $3.val, $3.val, $4.val); 
-                    regP = $3.val + 1; 
+                    $$.type = 2;
+                    $$.val = $3.val;
+                    if (strcmp($2, "^") == 0) fprintf(TAC, "\tR[%d] = pwr(R[%d],%d);\n", $3.val, $3.val, $4.val);
+                    else fprintf(TAC, "\tR[%d] = R[%d] %s %d;\n", $3.val, $3.val, $2, $4.val);
+                    regP = $3.val + 1;
                     break;
                 case 3: 
-                    fprintf(TAC, "\tR[%d] = pwr(R[%d], R[%d]);\n", $$ = $3.val, $3.val, $4.val); 
-                    regP = $3.val + 1; 
+                    $$.type = 2;
+                    $$.val = $3.val;
+                    if (strcmp($2, "^") == 0) fprintf(TAC, "\tR[%d] = pwr(R[%d], R[%d]);\n", $3.val, $3.val, $4.val);
+                    else fprintf(TAC, "\tR[%d] = R[%d] %s R[%d];\n", $3.val, $3.val, $2, $4.val);
+                    regP = $3.val + 1;
                     break;
             }
             break;
             }
-        } else {
-            switch (arg1) {
-            case 1: switch (arg2) {
-                case 1: 
-                    if (regP < 12) {
-                        fprintf(TAC, "\tR[%d] = R[0] %s R[1];\n", $$ = regP, $2); 
-                        regP++;
-                    } else {
-                        fprintf(TAC, "\tR[0] = R[0] %s R[1];\n", $2);
-                        $$ = temp();
-                        fprintf(TAC, "\tMEM[%d] = R[0];\n", $$);
-                    }
-                    break;
-                case 2: 
-                    if (regP < 12) {
-                        fprintf(TAC, "\tR[%d] = R[0] %s %d;\n", $$ = regP, $2, $4.val); 
-                        regP++;
-                    } else {
-                        fprintf(TAC, "\tR[0] = R[0] %s %d;\n", $2, $4.val);
-                        $$ = temp();
-                        fprintf(TAC, "\tMEM[%d] = R[0];\n", $$);
-                    }
-                    break;
-                case 3: 
-                    fprintf(TAC, "\tR[%d] = R[0] %s R[%d];\n", $$ = $4.val, $2, $4.val); 
-                    regP = $4.val + 1; 
-                    break;
-            }
-            break;
-            case 2: switch (arg2) {
-                case 1: 
-                    if (regP < 12) {
-                        fprintf(TAC, "\tR[%d] = %d %s R[1];\n", $$ = regP, $3.val, $2); 
-                        regP++;
-                    } else {
-                        fprintf(TAC, "\tR[0] = %d %s R[1];\n", $3.val, $2);
-                        $$ = temp();
-                        fprintf(TAC, "\tMEM[%d] = R[0];\n", $$);
-                    }
-                    break;
-                case 2: 
-                    if (regP < 12) {
-                        fprintf(TAC, "\tR[%d] = %d %s %d;\n", $$ = regP, $3.val, $2, $4.val); 
-                        regP++;
-                    } else {
-                        fprintf(TAC, "\tR[0] = %d %s %d;\n", $3.val, $2, $4.val);
-                        $$ = temp();
-                        fprintf(TAC, "\tMEM[%d] = R[0];\n", $$);
-                    }
-                    break;
-                case 3: 
-                    fprintf(TAC, "\tR[%d] = %d %s R[%d];\n", $$ = $4.val, $3.val, $2, $4.val); 
-                    regP = $4.val + 1; 
-                    break;
-            }
-            break;
-            case 3: switch (arg2) {
-                case 1: 
-                    fprintf(TAC, "\tR[%d] = R[%d] %s R[1];\n", $$ = $3.val, $3.val, $2); 
-                    regP = $3.val + 1; 
-                    break;
-                case 2: 
-                    fprintf(TAC, "\tR[%d] = R[%d] %s %d;\n", $$ = $3.val, $3.val, $2, $4.val); 
-                    regP = $3.val + 1; 
-                    break;
-                case 3: 
-                    fprintf(TAC, "\tR[%d] = R[%d] %s R[%d];\n", $$ = $3.val, $3.val, $2, $4.val); 
-                    regP = $3.val + 1; 
-                    break;
-            }
-            break;
-            }
-        }
+        // } else {
+        //     switch (arg1) {
+        //     case 1: switch (arg2) {
+        //         case 1: fprintf(TAC, "\tR[%d] = R[0] %s R[1];\n", $$ = regP, $2); regP++; break;
+        //         case 2: fprintf(TAC, "\tR[%d] = R[0] %s %d;\n", $$ = regP, $2, $4.val); regP++; break;
+        //         case 3: fprintf(TAC, "\tR[%d] = R[0] %s R[%d];\n", $$ = $4.val, $2, $4.val); regP = $4.val + 1; break;
+        //     }
+        //     break;
+        //     case 2: switch (arg2) {
+        //         case 1: fprintf(TAC, "\tR[%d] = %d %s R[1];\n", $$ = regP, $3.val, $2); regP++; break;
+        //         case 2: fprintf(TAC, "\tR[%d] = %d %s %d;\n", $$ = regP, $3.val, $2, $4.val); regP++; break;
+        //         case 3: fprintf(TAC, "\tR[%d] = %d %s R[%d];\n", $$ = $4.val, $3.val, $2, $4.val); regP = $4.val + 1; break;
+        //     }
+        //     break;
+        //     case 3: switch (arg2) {
+        //         case 1: fprintf(TAC, "\tR[%d] = R[%d] %s R[1];\n", $$ = $3.val, $3.val, $2); regP = $3.val + 1; break;
+        //         case 2: fprintf(TAC, "\tR[%d] = R[%d] %s %d;\n", $$ = $3.val, $3.val, $2, $4.val); regP = $3.val + 1; break;
+        //         case 3: fprintf(TAC, "\tR[%d] = R[%d] %s R[%d];\n", $$ = $3.val, $3.val, $2, $4.val); regP = $3.val + 1; break;
+        //     }
+        //     break;
+        //     }
+        // }
     };
 
 STMT: 
-      SETSTMT  { fprintf(TAC, "\tmprn(MEM, %d);\n", $1);}
-    | EXPRSTMT { fprintf(TAC, "\teprn(R, %d);\n", $1);};
+      SETSTMT  { fprintf(TAC, "\tmprn(MEM,%d);\n", $1);}
+    | EXPRSTMT { fprintf(TAC, "\teprn(R,%d);\n", $1);};
 
 SETSTMT: 
     '(' SET ID NUM ')' 
@@ -261,8 +254,7 @@ SETSTMT:
     { 
         update($3);
         int loc = get($3);
-        fprintf(TAC, "\tMEM[%d] = R[%d];\n", loc, $4);
-        for(int i = 0; i < 12; i++) reg[i] = false;
+        fprintf(TAC, "\tMEM[%d] = R[%d];\n", loc, $4.val);
         regP = 2;
         $$ = loc;        
     };
@@ -292,13 +284,15 @@ ARG:
         $$.val = $1;
     };
     | EXPR 
-    {   if (regP < 12) {
-            $$.type = 3;
-            $$.val = $1;
-        }
-        else {
+    { 
+        if ($1.type == 1) {
             $$.type = 1;
-            $$.memloc = $1;
+            $$.val = -1;
+            $$.memloc = $1.val;
+        } 
+        else if ($1.type == 2) {
+            $$.type = 3;
+            $$.val = $1.val;
         }
     };
 
@@ -309,5 +303,4 @@ OP:
     | '/' { $$ = "/"; }
     | '%' { $$ = "%"; }
     | '^' { $$ = "^"; };
-
 %% 
