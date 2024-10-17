@@ -1,0 +1,47 @@
+(set a 5)
+(set b 10)
+(set c 3)
+(set d 2)
+(set e 15)
+(set f 8)
+(set g 4)
+(set h 7)
+(set i 12)
+(set j 9)
+(set k 6)
+(set l 14)
+(set m 1)
+(set n 11)
+(set o 20)
+(set p 30)
+(set q 25)
+(set r 18)
+(set s 22)
+(set t 16)
+(set u 28)
+(set v 2)
+(set w 13)
+
+(+ 
+  (* 
+    (+ 
+      (* (+ a (* b c)) d) 
+      (/ e (+ f (* g h)))
+    ) 
+    (- j (/ (* k l) (+ m n)))
+  ) 
+  (- 
+    (* (+ p (* q r)) (/ s t)) 
+    (+ (* u v) w)
+  )
+)
+
+(/ 
+  (+ 
+    (* (+ (* a (+ b c)) (- d e)) 
+       (/ f (+ g h))
+    ) 
+    (- (* i (/ j k)) (+ l m))
+  ) 
+  (* (+ n (/ o p)) (- q r))
+)

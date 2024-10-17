@@ -213,6 +213,20 @@ int get(char* id)
     return get(id);
 }
 
+void symbolTable()
+{
+    printf("=====================================\n");
+    printf("SYMBOL TABLE:\n");
+    printf("=====================================\n");
+    printf("| %-20s | %-10s |\n", "Name", "Offset");
+    printf("|----------------------|------------|\n");
+    for (int i = 0; i < size; i++)
+    {
+        printf("| %-20s | %-10d |\n", SymbolTable[i].id, SymbolTable[i].offset << 2);
+    }
+    printf("=====================================\n");
+}
+
 int main(int argc, char *argv[])
 {
     yyin = stdin;
@@ -237,6 +251,7 @@ int main(int argc, char *argv[])
     fprintf(TAC, "\tint MEM[65536];\n\n");
 
     yyparse();
+    symbolTable();
 
     fprintf(TAC, "\n\texit(0);");
     fprintf(TAC, "\n}\n");
