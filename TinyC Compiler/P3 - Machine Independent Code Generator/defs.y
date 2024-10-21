@@ -1,10 +1,11 @@
 %{
     #include <iostream>
     using namespace std;
+
     extern int yylex(); // in lex.yy.c : Lexical analyser
     extern int yylineno; // in lex.yy.c : Line number
     extern char *yytext;    // in lex.yy.c : Identified lexeme
-    void yyerror(string s);  // in lex.yy.c : Error function
+    void yyerror(const string &s);  // in lex.yy.c : Error function
     extern string data_type; // in asgn5_21CS10005_21CS30031_translator.cxx : Stores the data type of the current variable
 %}
 
@@ -953,9 +954,9 @@ declaration_list    : declaration {}
                     ;
 %%
 
-// ERROR
-void yyerror(string s) {
-    cout << "ERROR: " << s << endl;
-    cout << "At line: " << yylineno << endl;
-    cout << "Near: " << yytext << endl;
+void yyerror(const string &s) {
+    int line = yylineno;
+    string loc = yytext;
+    cerr << "!!! ERROR: " << s << " at line " << line << ", near '" << loc << "'" << endl;
+    return;
 }

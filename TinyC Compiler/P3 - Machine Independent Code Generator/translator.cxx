@@ -2,7 +2,16 @@
 #include <iomanip>
 using namespace std;
 
-// Global variables as defined and explained in the header file
+string gen(int n, const string& s) {
+    string t;
+    for (int i = 0; i < n; ++i) t += s;
+    return t;
+}
+
+const int width = 135;
+const string sep = gen(width, "═");
+const string line = gen(width, "─");
+
 symbol* currentSymbol;
 symbolTable* currentSymbolTable;
 symbolTable* globalSymbolTable;
@@ -73,62 +82,36 @@ symbol* symbolTable::gentemp(symbolType* t, string initValue) {
     currentSymbolTable->table.push_back(*sym);
     return &(currentSymbolTable->table.back());
 }
-
 void symbolTable::print() {
-    for(int i = 0; i < 120; i++) {
-        cout << '-';
-    }
-    cout << endl;
-    cout << "Symbol Table: " << setfill(' ') << left << setw(50) << this->name;
-    cout << "Parent Table: " << setfill(' ') << left << setw(50) << ((this->parent != NULL) ? this->parent->name : "NULL") << endl;
-    for(int i = 0; i < 120; i++) {
-        cout << '-';
-    }
-    cout << endl;
+    cout << sep << endl;
+    cout << " Symbol Table: " << setfill(' ') << left << setw(54) << this->name;
+    cout << "| Parent Table: " << setfill(' ') << left << setw(50) << (this->parent ? this->parent->name : "NULL") << endl;
+    cout << line << endl;
 
-    // Table Headers
-    cout << setfill(' ') << left << setw(25) <<  "Name";
-    cout << left << setw(25) << "Type";
-    cout << left << setw(20) << "Initial Value";
-    cout << left << setw(15) << "Size";
-    cout << left << setw(15) << "Offset";
+    cout << setfill(' ') << left << setw(30) << " Name" << "│ ";
+    cout << left << setw(15) << "Type" << "│ ";
+    cout << left << setw(20) << "Initial Value" << "│ ";
+    cout << left << setw(10) << "Size" << "│ ";
+    cout << left << setw(15) << "Offset" << "│ ";
     cout << left << "Nested" << endl;
+    cout << line << endl;
 
-    for(int i = 0; i < 120; i++) {
-        cout << '-';
-    }
-    cout << endl;
-
-    list<symbolTable*> tableList;
-
-    // Print the symbols in the symbol table
-    for(list<symbol>::iterator it = this->table.begin(); it != this->table.end(); it++) {
-        cout << left << setw(25) << it->name;
-        cout << left << setw(25) << printType(it->type);
-        cout << left << setw(20) << (it->initValue != "" ? it->initValue : "-");
-        cout << left << setw(15) << it->size;
-        cout << left << setw(15) << it->offset;
+    symbolTable* tableList[100];
+    int size = 0;
+    for (auto& sym : this->table) {
+        cout << " " << left << setw(29) << sym.name << "│ ";
+        cout << left << setw(15) << printType(sym.type) << "│ ";
+        cout << left << setw(20) << (sym.initValue != "" ? sym.initValue : "-") << "│ ";
+        cout << left << setw(10) << sym.size << "│ ";
+        cout << left << setw(15) << sym.offset << "│ ";
         cout << left;
 
-        if(it->nestedTable != NULL) {
-            cout << it->nestedTable->name << endl;
-            tableList.push_back(it->nestedTable);
-        }
-        else {
-            cout << "NULL" << endl;
-        }
+        if(sym.nestedTable) tableList[size++] = sym.nestedTable;
+        (sym.nestedTable)? cout << sym.nestedTable->name << endl : cout << "NULL" << endl;
     }
 
-    for(int i = 0; i < 120; i++) {
-        cout << '-';
-    }
-    cout << endl << endl;
-
-    // Recursively call the print function for the nested symbol tables
-    for(list<symbolTable*>::iterator it = tableList.begin(); it != tableList.end(); it++) {
-        (*it)->print();
-    }
-
+    cout << line << endl << endl;
+    for(int i = 0; i < size; i++) tableList[i]->print();
 }
 
 void symbolTable::update() {
@@ -185,7 +168,7 @@ void quad::print() {
         cout << result << ": ";
 
     // Binary Operators
-    else if(opcode == "+" || opcode == "-" || opcode == "*" || opcode == "/" || opcode == "%" || opcode == "^" || opcode == "|" || opcode == "&" || opcode == "<<" || opcode == ">>")
+    else if(opcode == "+" || opcode == "-" || opcode == "*" || opcode == "/" || opcode == "%" || opcode == "^" || opcode == "| " || opcode == "&" || opcode == "<<" || opcode == ">>")
         cout << result << " = " << arguement1 << " " << opcode << " " << arguement2;
 
     // Relational Operators
@@ -202,14 +185,10 @@ void quad::print() {
 
 // Implementations of constructors and functions for the quadArray class
 void quadArray::print() {
-    for(int i = 0; i < 120; i++) {
-        cout << '-';
-    }
+    for(int i = 0; i < 135; i++) cout << '-';
     cout << endl;
     cout << "THREE ADDRESS CODE (TAC):" << endl;
-    for(int i = 0; i < 120; i++) {
-        cout << '-';
-    }
+    for(int i = 0; i < 135; i++) cout << '-';
     cout << endl;
 
     int cnt = 0;

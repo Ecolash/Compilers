@@ -2,11 +2,10 @@
     #include <stdio.h>
     #include "translator.h"
     #include "defs.tab.h"
-%}
 
-/* For bison to get line number */
-%option yylineno
-%option noyywrap
+    extern int yylineno;
+    extern char* yytext;
+%}
 
 /* States */
 %x SINGLE_LINE_COMM
@@ -146,3 +145,7 @@ WHITE_SPACE     [  \t\n]
 {LITERAL}                   {yylval.sValue = yytext ;return LITERAL;}
 {WHITE_SPACE}               {}
 %%
+
+int yywrap() {
+    return 1;
+}
