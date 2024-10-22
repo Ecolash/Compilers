@@ -27,8 +27,8 @@ Forward declarations for the classes used in the translator:
 class symbol;      
 class symbolType; 
 class symbolTable; 
-class quad;      
-class quadArray;  
+class quad; class quadArray;  
+class A; class S; class E;
 
 using sPtr = symbol*;
 using tPtr = symbolType*;
@@ -54,103 +54,200 @@ extern quadArray quadTable;
 extern int SymbolTableCount;            
 extern string blockName;                
 
-/* Lex objects */
 extern int yyparse();
 extern char *yytext;
 
+/*
+==================================================================================================================
+Class symbol:
+==================================================================================================================
+- string name         | Name of the symbol.
+- tPtr type           | Type of the symbol.
+- string initValue    | Initial value of the symbol.
+- int size            | Size of the symbol.
+- int offset          | Offset of the symbol.
+- STPtr nestedTable   | Nested symbol table if the symbol is a function/record.
+==================================================================================================================
+- symbol(string, string = "int", tPtr = NULL, int = 0)   | Constructor to initialize a symbol.
+- sPtr update(tPtr t)                                    | Updates the type of the symbol.
+==================================================================================================================
+*/
+
 class symbol
 {
-public:
-    string name;              // Name of symbol
-    tPtr type;         // Type of symbol
-    string initValue;         // Initial value of symbol
-    int size;                 // Size of symbol
-    int offset;               // Offset of symbol
-    STPtr  nestedTable; // Nested symbol table if symbol is a function/record
+    public:
+        string name;
+        tPtr type;
+        string initValue;
+        int size;
+        int offset;
+        STPtr nestedTable;
 
-    symbol(string name_, string type_ = "int", tPtr arrType = NULL, int width = 0); // Constructor
-    sPtr update(tPtr t);                                                         // Update type of symbol to t
+    symbol(string, string = "int", tPtr = NULL, int = 0);
+    sPtr update(tPtr t);
 };
+
+/*
+==================================================================================================================
+Class symbolType:
+==================================================================================================================
+- string base         | Base type of symbol.
+- int width           | Width of symbol, 1 by default. Size for arrays.
+- tPtr arrType        | Array type of symbol.
+==================================================================================================================
+- symbolType(string, tPtr = NULL, int = 1)               | Constructor to initialize a symbol type.
+==================================================================================================================
+*/
 
 class symbolType
 {
 public:
-    string base;         // Base type of symbol
-    int width;           // Width of symbol, 1 by default. Size for arrays
-    tPtr arrType; // Array type of symbol
+    string base;
+    int width;
+    tPtr arrType;
 
-    symbolType(string base_, tPtr arrType_ = NULL, int width_ = 1); // Constructor
+    symbolType(string base_, tPtr arrType_ = NULL, int width_ = 1);
 };
+
+/*
+==================================================================================================================
+Class symbolTable:
+==================================================================================================================
+- string name         | Name of symbol table.
+- int count           | Count of symbols in symbol table.
+- list<symbol> table  | List of symbols in symbol table.
+- STPtr parent        | Parent symbol table.
+==================================================================================================================
+- symbolTable(string = "NULL")                           | Constructor to initialize a symbol table.
+- sPtr lookup(string)                                    | Lookup for symbol in symbol table.
+- static sPtr gentemp(tPtr, string = "")                 | Generate temporary symbol.
+- void update()                                          | Update offset of symbols in symbol table.
+- void print()                                           | Print symbol table.
+==================================================================================================================
+*/
 
 class symbolTable
 {
 public:
-    string name;         // Name of symbol table
-    int count;           // Count of symbols in symbol table
-    list<symbol> table;  // List of symbols in symbol table
-    STPtr  parent; // Parent symbol table
+    string name;
+    int count;
+    list<symbol> table;
+    STPtr parent;
 
-    symbolTable(string name_ = "NULL"); // Constructor
+    symbolTable(string name_ = "NULL");
 
-    sPtr lookup(string name);                                       // Lookup for symbol in symbol table
-    static sPtr gentemp(tPtr type_, string initValue_ = ""); // Generate temporary symbol
-    void update();                                                     // Update offset of symbols in symbol table
-    void print();                                                      // Print symbol table
+    sPtr lookup(string name);
+    static sPtr gentemp(tPtr type_, string initValue_ = "");
+    void update();
+    void print();
 };
+
+/*
+==================================================================================================================
+Class quad:
+==================================================================================================================
+- string opcode       | Opcode of quad.
+- string arguement1   | First argument of quad.
+- string arguement2   | Second argument of quad.
+- string result       | Result of quad.
+==================================================================================================================
+- quad(string, string, string = "=", string = "")        | Constructor for string argument.
+- quad(string, int, string = "=", string = "")           | Constructor for int argument.
+- quad(string, float, string = "=", string = "")         | Constructor for float argument.
+- void print()                                           | Print quad.
+==================================================================================================================
+*/
 
 class quad
 {
 public:
-    string opcode;     // Opcode of quad
-    string arguement1; // First argument of quad
-    string arguement2; // Second argument of quad
-    string result;     // Result of quad
+    string opcode;
+    string arguement1;
+    string arguement2;
+    string result;
 
-    quad(string res_, string arg1_, string op_ = "=", string arg2_ = ""); // Constructor for string argument
-    quad(string res_, int arg1_, string op_ = "=", string arg2_ = "");    // Constructor for int argument
-    quad(string res_, float arg1_, string op_ = "=", string arg2_ = "");  // Constructor for float argument
+    quad(string res_, string arg1_, string op_ = "=", string arg2_ = "");
+    quad(string res_, int arg1_, string op_ = "=", string arg2_ = "");
+    quad(string res_, float arg1_, string op_ = "=", string arg2_ = "");
 
-    void print(); // Print quad
+    void print();
 };
+
+/*
+==================================================================================================================
+Class quadArray:
+==================================================================================================================
+- vector<quad> array  | Vector of quads.
+==================================================================================================================
+- void print()                                           | Print quad array.
+==================================================================================================================
+*/
 
 class quadArray
 {
 public:
-    vector<quad> array; // Vector of quads
-    void print();       // Print quad array
+    vector<quad> array;
+    void print();
 };
 
-// Method to add a new quad.
-void emit(string opcode, string res, string arg1 = "", string arg2 = ""); // String type arg
-void emit(string opcode, string res, int arg1, string arg2 = "");         // Int type arg
-void emit(string opcode, string res, float arg1, string arg2 = "");       // Float type arg
+void emit(string opcode, string res, string arg1 = "", string arg2 = ""); 
+void emit(string opcode, string res, int arg1, string arg2 = "");         
+void emit(string opcode, string res, float arg1, string arg2 = "");       
 
-// Array class for arrays and pointers
+/*
+==================================================================================================================
+Class A:
+==================================================================================================================
+- string arrType      | Type of array. arr or ptr.
+- sPtr addr           | Base symbol of array in Symbol Table.
+- sPtr location       | To get address of array.
+- tPtr type           | Type of array stored in symbol table.
+==================================================================================================================
+*/
+
 class A
 {
 public:
-    string arrType;   // Type of array. arr or ptr
-    sPtr addr;     // Base symbol of array in Symbol Table
-    sPtr location; // To get address of array
-    tPtr type; // Type of array stored in symbol table
+    string arrType;
+    sPtr addr;
+    sPtr location;
+    tPtr type;
 };
 
-// Statement class for statements
+/*
+==================================================================================================================
+Class S:
+==================================================================================================================
+- list<int> nextList  | List of nexts.
+==================================================================================================================
+*/
+
 class S
 {
 public:
-    list<int> nextList; // List of nexts
+    list<int> nextList;
 };
 
-// Expression class for expressions
+/*
+==================================================================================================================
+Class E:
+==================================================================================================================
+- string exprType     | Type of expression. bool or not_bool.
+- sPtr addr           | Base symbol of expression in Symbol Table.
+- list<int> trueList  | List of statements for true.
+- list<int> falseList | List of statements for false.
+- list<int> nextList  | List of nexts.
+==================================================================================================================
+*/
+
 class E
 {
 public:
-    string exprType;     // Type of expression. bool or not_bool
-    sPtr addr;        // Base symbol of expression in Symbol Table
-    list<int> trueList;  // List of statements for true
-    list<int> falseList; // List of statements for false
-    list<int> nextList;  // List of nexts
+    string exprType;
+    sPtr addr;
+    list<int> trueList;
+    list<int> falseList;
+    list<int> nextList;
 };
 
 /* GLOBAL FUNCTIONS */

@@ -12,9 +12,9 @@ const int width = 135;
 const string sep = gen(width, "═");
 const string line = gen(width, "─");
 
-symbol* currentSymbol;
-symbolTable* currentSymbolTable;
-symbolTable* globalSymbolTable;
+sPtr currentSymbol;
+STPtr currentSymbolTable;
+STPtr globalSymbolTable;
 quadArray quadTable;
 int SymbolTableCount;
 string blockName;
@@ -32,7 +32,7 @@ symbol::symbol(string name_, string type_, symbolType* arrType, int width): name
     size = sizeOfType(type);
 }
 
-symbol* symbol::update(symbolType* t) {
+sPtr symbol::update(symbolType* t) {
     // Update the type and size for the symbol
     type = t;
     size = sizeOfType(t);
@@ -42,7 +42,7 @@ symbol* symbol::update(symbolType* t) {
 // Implementations of constructors and functions for the symbolTable class
 symbolTable::symbolTable(string name_): name(name_), count(0), parent(NULL) {}
 
-symbol* symbolTable::lookup(string name) {
+sPtr symbolTable::lookup(string name) {
     // Start searching for the symbol in the symbol table
     for(list<symbol>::iterator it = table.begin(); it != table.end(); it++) {
         if(it->name == name) {
@@ -51,14 +51,14 @@ symbol* symbolTable::lookup(string name) {
     }
 
     // If not found, go up the hierarchy to search in the parent symbol tables
-    symbol* s = NULL;
+    sPtr s = NULL;
     if(this->parent != NULL) {
         s = this->parent->lookup(name);
     }
 
     if(currentSymbolTable == this && s == NULL) {
         // If the symbol is not found, create the symbol, add it to the symbol table and return a pointer to it
-        symbol* sym = new symbol(name);
+        sPtr sym = new symbol(name);
         table.push_back(*sym);
         return &(table.back());
     }
@@ -70,10 +70,10 @@ symbol* symbolTable::lookup(string name) {
     return NULL;
 }
 
-symbol* symbolTable::gentemp(symbolType* t, string initValue) {
+sPtr symbolTable::gentemp(symbolType* t, string initValue) {
     // Create the name for the temporary
     string name = "t" + convIntToStr(currentSymbolTable->count++);
-    symbol* sym = new symbol(name);
+    sPtr sym = new symbol(name);
     sym->type = t;
     sym->initValue = initValue;         // Assign the initial value, if any
     sym->size = sizeOfType(t);
@@ -96,7 +96,7 @@ void symbolTable::print() {
     cout << left << "Nested" << endl;
     cout << line << endl;
 
-    symbolTable* tableList[100];
+    STPtr tableList[100];
     int size = 0;
     for (auto& sym : this->table) {
         cout << " " << left << setw(29) << sym.name << "│ ";
@@ -115,7 +115,7 @@ void symbolTable::print() {
 }
 
 void symbolTable::update() {
-    list<symbolTable*> tableList;
+    list<STPtr> tableList;
     int off_set;
 
     // Update the offsets of the symbols based on their sizes
@@ -135,7 +135,7 @@ void symbolTable::update() {
     }
 
     // Recursively call the update function to update the offsets of symbols of the nested symbol tables
-    for(list<symbolTable*>::iterator iter = tableList.begin(); iter != tableList.end(); iter++) {
+    for(list<STPtr>::iterator iter = tableList.begin(); iter != tableList.end(); iter++) {
         (*iter)->update();
     }
 }
@@ -243,7 +243,7 @@ void backpatch(list<int> l, int address) {
 }
 
 // Implementation of the typecheck functions
-bool typecheck(symbol* &s1, symbol* &s2) {
+bool typecheck(sPtr &s1, sPtr &s2) {
     symbolType* t1 = s1->type;
     symbolType* t2 = s2->type;
 
@@ -269,8 +269,8 @@ bool typecheck(symbolType* t1, symbolType* t2) {
 }
 
 // Implementation of the convType function
-symbol* convType(symbol* s, string t) {
-    symbol* temp = symbolTable::gentemp(new symbolType(t));
+sPtr convType(sPtr s, string t) {
+    sPtr temp = symbolTable::gentemp(new symbolType(t));
 
     if(s->type->base == "float") {
         if(t == "int") {
@@ -343,7 +343,7 @@ E* convBoolToInt(E* expr) {
     return expr;
 }
 
-void switchTable(symbolTable* newTable) {
+void switchTable(STPtr newTable) {
     currentSymbolTable = newTable;
 }
 
