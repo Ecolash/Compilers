@@ -1,50 +1,40 @@
+//This file tests control flow from one function to another
 
-int arraySize = 3;
+int mod = 1000000000 + 7;
+int mod2 = 998244353;
 
-void generateSubmatrix(int matrix[arraySize][arraySize], int submatrix[arraySize][arraySize], int row, int col, int size) {
-    int i = 0, j = 0, subRow = 0, subCol = 0;
+int binpow(int a, int b) {
+	int ans = 1;
+	while (b != 0) {
+		if((b & 1) != 0) ans = (ans * a) % mod;
+		a = (a * a) % mod;
+		b = b >> 1;
+	}
+	return ans;
+}
 
-    for (subRow = 0; subRow < size; subRow++) { // Nested for loop
-        for (subCol = 0; subCol < size; subCol++) {
-            if (subRow != row && subCol != col) {
-                submatrix[i][j++] = matrix[subRow][subCol];
-            }
-            if (j == size - 1) {
-                j = 0;
-                i++;
-            }
-        }
-    }
-    return;
+int rec(int exp, int base)
+{
+	if (exp == 0) return 1;
+	int t = rec(exp / 2, base);
+	if (exp % 2 == 0) return (t * t) % mod2;
+	return (base * t * t) % mod2;
 }
 
 int main() {
-    int numbers[4]; // 1D integer array
-    int index = 0;
+    int a = 9, b = 3;
+    gcd(a, b);
+    binpow(++a, b++);
+	int c = rec(a--, --b);
+	int arr[100][200];
 
-    while (index < 4) { // while loop
-        numbers[index++] = index;
-    }
-
-    int total = 0;
-    int arraySize = 4;
-    index = 0;
-    do { // do-while loop
-        total = total + numbers[index++];
-    } while (index < arraySize);
-
-    int matrix[arraySize][arraySize];
-
-    int row = 0, col = 0, value = 10;
-
-    for (row = 0; row < arraySize; row++) {
-        for (col = 0; col < arraySize; col++) {
-            matrix[row][col] = value++;
-        }
-    }
-
-    int submatrix[arraySize][arraySize];
-    generateSubmatrix(matrix, submatrix, 0, 0, arraySize);
-
+	while(a--) 
+	{
+		if (a % 2) continue;
+		else a = a / 2;
+		c = rec(binpow(a,b), c);
+		while (c-- > -5) b++;
+		arr[a][b] = c;
+	}
     return 0;
 }

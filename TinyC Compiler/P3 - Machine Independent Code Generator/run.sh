@@ -14,19 +14,19 @@ mkdir -p ./Outputs
 echo "Inputs contains the test cases."
 echo "Running test cases..."
 
-./a.out < Inputs/input1.c > Outputs/output1.out
+./a.out Inputs/input1.c > Outputs/output1.out
 echo "(1/5) Testcases run successfully..."
 
-./a.out < Inputs/input2.c > Outputs/output2.out
+./a.out Inputs/input2.c > Outputs/output2.out
 echo "(2/5) Testcases run successfully..."
 
-./a.out < Inputs/input3.c > Outputs/output3.out
+./a.out Inputs/input3.c > Outputs/output3.out
 echo "(3/5) Testcases run successfully..."
 
-./a.out < Inputs/input4.c > Outputs/output4.out
+./a.out Inputs/input4.c > Outputs/output4.out
 echo "(4/5) Testcases run successfully..."
 
-./a.out < Inputs/input5.c > Outputs/output5.out
+./a.out Inputs/input5.c > Outputs/output5.out
 echo "(5/5) Testcases run successfully..."
 
 echo "Check Outputs folder for the outputs..."

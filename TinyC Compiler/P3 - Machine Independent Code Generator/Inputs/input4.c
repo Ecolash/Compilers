@@ -1,48 +1,40 @@
-float power(float base, int exponent) {
-    if (exponent == 0) {
-        return 1.0;
-    } else if (exponent > 0) {
-        return base * power(base, exponent - 1);
-    } else {
-        // Negative exponent
-        return 1.0 / (base * power(base, -exponent - 1));
-    }
-}
+int main()
+{
+    int a = 10, b = 3, c = 5, d = 7, e = 2, f, g, h, i, j;
 
-int main() {
-    int num;
-    float base;
-    int exponent;
-    float result;
+    f = a + (b * c) - d / e + (a % b) * (c - d);
+    g = ((a - b) * (c + d) / e) % (a + 1);
+    h = (a + b * (c - d)) - (e * f) + g * (d - e);
 
-    num = 5;
-    base = 2.0;
-    exponent = 3;
-    result = 0.0;
+    a = ((a + c * 2) - (b + e) / (d + 1)) * 2;
+    b = ((a % 3) + (f - d) * (g + e)) / 4;
+    c = ((b * b) - (a + c) * 2 + d) % (e + 1);
 
-    if (exponent < 0) {
-        exponent = -exponent;
-    } else {
-        result = power(base, exponent);
-    }
+    a = (a & b | c ^ d) + (e & f | g ^ h);
+    b = (a << 2) + (b >> 1) - (c << 1) + d >> 1;
+    c = (~a & b) | (c ^ (d & e)) ^ (f | g);
 
-    if (num % 2 == 0) {
-        if (num > 0) {
-            num += 1;
-        } else if (num < 0) {
-            num -= 1;
-        } else {
-            num = 0;
-        }
-    } else {
-        if (num > 0) {
-            num += 2;
-        } else if (num < 0) {
-            num -= 2;
-        } else {
-            num = 0;
-        }
-    }
+    a > b ? (c * e - g) : (h / f + e);
+    e = (a <= d ? b : c) + (f >= g ? d : h);
+    f = a == c ? ((e * g) - h) : ((b - d) + f);
+
+    a += b * c - d;
+    b -= (c / e) * (f % 3);
+    c *= (g - h) + (a / 2);
+    d /= e + (f - a) * 2;
+    e %= (b + c * 3) / 2;
+
+    a &= b | (c & d);
+    b |= c ^ (d & f);
+    c ^= (d | (e & g)) ^ h;
+    d <<= (e + 2) % 3;
+    e >>= (a - 1) % 2;
+
+    f = ((a + b * c) - (d | e)) & ((f ^ g) + (h - i));
+    g = ((a ^ (b & c)) << 1) + ((d | e) >> 2) - h;
+    h = a && d ? e + f - g : h + i;
+    i = (a | c) + (b ^ d) - ((e & g) + (f << 1)) * 3;
+    j = ((a + b - c) * (d | e)) ^ (f & (g + h - i));
 
     return 0;
 }

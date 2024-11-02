@@ -1,35 +1,32 @@
-float pi = 3.14159265;
-char grade;	
-int number1, number2, result1, result2, quotient, remainder;
-int myArray[5];                   // 1D array declaration
-float matrix[3][3];               // 2D array declaration
-int age = 30, *ptr, temperature;   // pointer declaration
 
-void printMessage (int num, float val) {
-    val = (float)(num + 42);
-    return;
+const int X = 3;
+const int Y = 4;
+const int Z = 5;
+
+void solve(int dp[X][Y][Z])
+{
+    for (int i = 0; i < X; ++i)
+    for (int j = 0; j < Y; ++j)
+    {
+        for (int k = 0; k < Z; ++k)
+        {
+            if (i == 0 || j == 0 || k == 0) dp[i][j][k] = 1;
+            else
+            {
+                int a, b, c;
+                a = dp[i - 1][j][k];
+                b = dp[i][j - 1][k];
+                c = dp[i][j][k - 1];
+                dp[i][j][k] = a + b + c;
+            }
+        }
+    }
 }
 
-int main () {
-    // Variable Declaration
-    int apples = 10;
-    int bananas = 3;
-    char initial = 'M', grade = 'A';  // character definitions
 
-    // Arithmetic Operations
-    number1 = apples + bananas;
-    number2 = apples - bananas;
-    result1 = apples * bananas;
-    result2 = apples / bananas;
-    quotient = apples % bananas;
-    remainder = apples & bananas;
-    grade = grade | 'B';
-
-    bananas = number1 << 2;
-    apples = number2 >> 1;
-
-    // Call a function
-    printMessage(apples, pi);
-
+int main()
+{
+    int dp[X][Y][Z] = {0};
+    solve(dp);
     return 0;
 }
