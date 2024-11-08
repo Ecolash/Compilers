@@ -653,10 +653,8 @@ int main(int argc, char *argv[])
     if (argc > 1)
     {
         FILE *file = fopen(argv[1], "r");
-        if (!file)
-            fprintf(stderr, "Error opening file: %s\n", argv[1]);
-        if (!file)
-            exit(1);
+        if (!file) fprintf(stderr, "Error opening file: %s\n", argv[1]);
+        if (!file) exit(1);
         yyin = file;
     }
 
