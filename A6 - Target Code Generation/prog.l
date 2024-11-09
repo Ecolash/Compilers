@@ -16,7 +16,7 @@ nl          [\n]
 
 "set"       { yylval.keyword = set; return set; }
 "when"      { yylval.keyword = when; return when; }
-"while"     { yylval.keyword = while_; return while_; }
+"while"     { yylval.keyword = WHILE; return WHILE; }
 "loop"      { yylval.keyword = loop; return loop; }
 
 "+"         { yylval.op = strdup(yytext); return ADD; }

@@ -10,11 +10,13 @@ using namespace std;
 
 extern FILE *yyin;
 extern int yylineno;
+extern int block[1 << 15];
 
 extern STPtr __GLOBAL_SYMBOL_TABLE__;
 extern QTPtr __GLOBAL_QUAD_TABLE__;
+extern int BLOCK_NUM;
 extern int QUAD_CNT;
-extern int TEMP_CNT;
+extern int TEMP_currline;
 extern int OFFSET;
 
 sPtr init(char *name, int type, int size, int offset)
@@ -45,6 +47,16 @@ STPtr init_ST()
     STPtr table = new Symbol_table();
     table->head = NULL;
     return table;
+}
+
+void gen_blocks()
+{
+    qPtr quad = __GLOBAL_QUAD_TABLE__->head;
+    for (; quad != NULL; quad = quad->next)
+    {
+        if (!strcmp(quad->op, "goto")) block[atoi(quad->result)] = 1;
+        else continue;
+    }
 }
 
 QTPtr init_QT()
@@ -114,20 +126,24 @@ void backpatch(int idx, int instr)
     }
 }
 
-void printQT()
+void printQT(int currline = 1)
 {
-    int cnt = 1;
     qPtr quad = __GLOBAL_QUAD_TABLE__->head;
     while (quad != NULL)
     {
-        cout << setw(4) << cnt << " :\t";
+        if (currline == 1) cout << "Block " << ++BLOCK_NUM << endl;
+        else if (block[currline] == 1) cout << "\nBlock " << ++BLOCK_NUM << endl;
+        cout << setw(4) << currline << " :\t";
+
         if (!strcmp(quad->result, "if"))
         {
             cout << "ifFalse (";
             cout << quad->arg1 << " " << (strcmp(quad->op, "=") == 0 ? "==" : (strcmp(quad->op, "/=") == 0 ? "!=" : quad->op)) << " " << quad->arg2;
             cout << ") goto " << quad->next->result << endl;
+            cout << "\nBlock " << ++BLOCK_NUM << endl;
             quad = quad->next->next;
         }
+
         else if (!strcmp(quad->op, "goto"))
         {
             cout << "goto " << quad->result << endl;
@@ -140,9 +156,9 @@ void printQT()
             cout << endl;
             quad = quad->next;
         }
-        cnt++;
+        currline++;
     }
-    cout << setw(4) << cnt << " :\t";
+    cout << setw(4) << currline << " :\t";
     cout << "EOP" << endl;
     return;
 }
@@ -167,6 +183,7 @@ int main(int argc, char *argv[])
     __GLOBAL_SYMBOL_TABLE__ = init_ST();
     __GLOBAL_QUAD_TABLE__ = init_QT();
     yyparse();
+    gen_blocks();
     printQT();
     return 0;
 }

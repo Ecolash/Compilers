@@ -22,7 +22,7 @@
         bool type; 
         int size;
         int offset;
-        Symbol *next;
+        sPtr next;
     };
 
     struct Quad {
@@ -31,7 +31,7 @@
         char* arg1;
         char* arg2;
         char* result;
-        Quad *next;
+        qPtr next;
     };
 
     struct Symbol_table { sPtr head; };
@@ -45,6 +45,8 @@
     int QUAD_CNT = 0;
     int TEMP_CNT = 0;
     int OFFSET = 0;
+    int BLOCK_NUM = 0;
+    int block[1 << 15] = {0};
 
     STPtr init_ST();
     QTPtr init_QT();
@@ -77,7 +79,7 @@
 
 %token <id> IDEN
 %token <num> NUMB
-%token <keyword> set when loop while_
+%token <keyword> set when loop WHILE
 %token <op> ADD SUB MUL DIV MOD
 %token <relop> EQ LT GT LE GE NE
 %token <punc> LP RP
@@ -92,66 +94,6 @@
     STMT: ASGN { $$.nextlist = 0; }
         | COND { $$ = $1; }
         | LOOP { $$ = $1; }
-        ;
-
-    ASGN: LP set IDEN ATOM RP {
-            if (find($3) == NULL) {
-                insert($3, 1, sizeof($3), OFFSET);
-            }
-            OFFSET += sizeof($3);
-            emit((char*)"=", $4->name, NULL, find($3)->name);
-        }
-        ;
-
-    COND: LP when BOOL LIST M RP {
-            backpatch($3.falselist, $5); // change
-            $$ = $4;
-        }
-        ;
-
-    LOOP: LP loop while_ M BOOL LIST M RP {
-            char* instr = (char*)malloc(10 * sizeof(char));
-            sprintf(instr, "%d", $4);
-            emit((char*)"goto", NULL, NULL, instr);
-            backpatch($5.falselist, $7 + 1); // change
-            $6.nextlist = $4; // backpatch
-            $$.nextlist = $7 + 1;
-        }
-        ;
-
-    EXPR: LP OPER ATOM ATOM RP {
-            char* temp = (char*)malloc(10 * sizeof(char));
-            TEMP_CNT++;
-            sprintf(temp, "$%d", TEMP_CNT);
-            insert(temp, 0, 4, OFFSET);
-            OFFSET += 4;
-
-            emit($2, $3->name, $4->name, temp);
-            $$ = find(temp);
-        }
-        ;
-
-    BOOL: LP RELN ATOM ATOM RP {
-            emit($2, $3->name, $4->name, (char*)"if");
-            $$.falselist = emit((char*)"goto", NULL, NULL, (char*)"-1");
-        }
-        ;
-
-    ATOM: IDEN {
-            sPtr temp = find($1);
-            if (temp == NULL) {
-                printf("Error: Symbol not found\n");
-                exit(EXIT_FAILURE);
-            }
-            $$ = temp;
-        }
-        | NUMB {
-            sPtr temp = new Symbol();
-            char* num = new char[10];
-            sprintf(num, "%d", $1);
-            $$ = init(num, 0, 4, -1);
-        }
-        | EXPR { $$ = $1; }
         ;
 
     OPER: ADD { $$ = $1; }
@@ -169,10 +111,63 @@
         | NE { $$ = $1; }
         ;
 
-    M: %empty {
-            $$ = nextinstr();
+    M:  { $$ = nextinstr(); };
+
+
+    ASGN: LP set IDEN ATOM RP {
+            if (find($3) == NULL) insert($3, 1, sizeof($3), OFFSET);
+            OFFSET += sizeof($3);
+            emit((char*)"=", $4->name, NULL, find($3)->name);
         }
         ;
 
+    COND: LP when BOOL LIST M RP {
+            backpatch($3.falselist, $5); 
+            $$ = $4;
+        }
+        ;
+
+    LOOP: LP loop WHILE M BOOL LIST M RP {
+            char* instr = new char[10];
+            sprintf(instr, "%d", $4);
+            emit((char*)"goto", NULL, NULL, instr);
+            backpatch($5.falselist, $7 + 1); 
+            $6.nextlist = $4; 
+            $$.nextlist = $7 + 1;
+        }
+        ;
+
+    EXPR: LP OPER ATOM ATOM RP {
+            char* temp = new char[10];
+            sprintf(temp, "$%d", ++TEMP_CNT);
+            insert(temp, 0, 4, OFFSET);
+            OFFSET += 4;
+
+            emit($2, $3->name, $4->name, temp);
+            $$ = find(temp);
+        }
+        ;
+
+    BOOL: LP RELN ATOM ATOM RP {
+            emit($2, $3->name, $4->name, (char*)"if");
+            $$.falselist = emit((char*)"goto", NULL, NULL, (char*)"-1");
+        }
+        ;
+
+    ATOM: IDEN 
+        {
+            sPtr temp = find($1);
+            if (temp == NULL) { fprintf(stderr, "Error: Symbol not found\n"); exit(EXIT_FAILURE); }
+            $$ = temp;
+        }
+        | NUMB 
+        {
+            char* num = new char[10];
+            sPtr temp = new Symbol();
+            sprintf(num, "%d", $1);
+            $$ = init(num, 0, 4, -1);
+        }
+        | EXPR { $$ = $1; }
+        ;
         
 %%
