@@ -14,10 +14,12 @@ extern int block[1 << 15];
 
 extern STPtr __GLOBAL_SYMBOL_TABLE__;
 extern QTPtr __GLOBAL_QUAD_TABLE__;
+extern QTPtr 
 extern int BLOCK_NUM;
 extern int QUAD_CNT;
 extern int TEMP_currline;
 extern int OFFSET;
+
 
 sPtr init(char *name, int type, int size, int offset)
 {
@@ -169,7 +171,6 @@ void yyerror(const char* s)
     cerr << "!!! ERROR: " << s << " at line " << line << endl;
     return;
 }
-
 int main(int argc, char *argv[])
 {
     yyin = stdin;
@@ -180,10 +181,26 @@ int main(int argc, char *argv[])
         if (!file) exit(1);
         yyin = file;
     }
+    else 
+    {
+        cout 
+        cout << "Usage: " << argv[0] << " <input_file> [N]" << endl;
+        exit(1);
+    }
+
+    int N = 5; 
+    if (argc > 2)
+    if (argc > 2) N = atoi(argv[2]);
+
+
+    freopen("intermediate.out", "w", stdout);
     __GLOBAL_SYMBOL_TABLE__ = init_ST();
     __GLOBAL_QUAD_TABLE__ = init_QT();
     yyparse();
     gen_blocks();
     printQT();
+
+    freopen("target.out", "w", stdout);
+
     return 0;
 }

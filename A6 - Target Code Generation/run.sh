@@ -8,7 +8,7 @@ echo "+++ Compiling with g++..."
 g++ -o parser codegen.cpp
 
 echo "+++ Running parser on input.txt..."
-./parser input.txt > output.txt
+./parser input.txt
 
 echo "+++ Cleaning up generated files..."
 rm -f lex.yy.c y.tab.c y.tab.h parser
