@@ -1,3 +1,5 @@
+rm -f target.out intermediate.out
+
 echo "+++ Generating parser code with yacc..."
 yacc -dtv prog.y
 
@@ -5,7 +7,7 @@ echo "+++ Generating lexical analyzer code with flex..."
 flex prog.l
 
 echo "+++ Compiling with g++..."
-g++ -o parser codegen.cpp
+g++ -o parser -w codegen.cpp
 
 echo "+++ Running parser on input.txt..."
 ./parser input.txt

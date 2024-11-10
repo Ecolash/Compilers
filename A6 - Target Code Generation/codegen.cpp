@@ -2,26 +2,24 @@
 #include <fstream>
 #include <cstring>
 #include <iomanip>
-
-using namespace std;
-
-#include "y.tab.c"
-#include "lex.yy.c"
-
-extern FILE *yyin;
-extern int yylineno;
-extern int block[1 << 15];
+#include "codegen.h"
 
 extern STPtr __GLOBAL_SYMBOL_TABLE__;
 extern QTPtr __GLOBAL_QUAD_TABLE__;
-extern QTPtr 
+extern QTPtr __TARGET_CODE_TABLE__;
+
 extern int BLOCK_NUM;
 extern int QUAD_CNT;
-extern int TEMP_currline;
 extern int OFFSET;
+extern int yylineno;
+extern FILE *yyin;
 
+const string sep = string(80, '=');
+const string sep2 = string(80, '-');
 
-sPtr init(char *name, int type, int size, int offset)
+using namespace std;
+
+sPtr init_symbol(char *name, int type, int size, int offset)
 {
     sPtr S0 = new Symbol();
     S0->name = strdup(name);
@@ -51,6 +49,13 @@ STPtr init_ST()
     return table;
 }
 
+QTPtr init_QT()
+{
+    QTPtr table = new Quad_table();
+    table->head = NULL;
+    return table;
+}
+
 void gen_blocks()
 {
     qPtr quad = __GLOBAL_QUAD_TABLE__->head;
@@ -61,16 +66,31 @@ void gen_blocks()
     }
 }
 
-QTPtr init_QT()
+void gen_blocks2()
 {
-    QTPtr table = new Quad_table();
-    table->head = NULL;
-    return table;
+    for (int i = 0; i < 1024; i++)
+    for (int j = 0; j < 10; j++)
+    if (target_code[i][j] != 0)
+    {
+        int label = correlation[i];
+        int idx = target_code[i][j] - 1;
+        if (label == -1) label = ASSEMBLY_CNT + 1;
+        qPtr temp = __TARGET_CODE_TABLE__->head;
+        for (; temp != NULL; temp = temp->next)
+        {
+            if (temp->idx == idx)
+            {
+                temp->result = new char[10];
+                sprintf(temp->result, "%d", label + 1);
+                break;
+            }
+        }
+    }
 }
 
 void insert(char *name, int type, int size, int offset)
 {
-    sPtr S0 = init(name, type, size, offset);
+    sPtr S0 = init_symbol(name, type, size, offset);
     sPtr *temp = &__GLOBAL_SYMBOL_TABLE__->head;
     while (*temp != NULL) temp = &(*temp)->next;
     *temp = S0;
@@ -165,12 +185,39 @@ void printQT(int currline = 1)
     return;
 }
 
+void printTC()
+{
+    qPtr quad = __TARGET_CODE_TABLE__->head;
+    int lineno = 1;
+    while (quad != NULL)
+    {
+        if (!strcmp(quad->op, "Block"))
+        {
+            cout << "\nBlock " << BLOCK_NUM++ << endl;
+            quad = quad->next;
+            continue;
+        }
+        cout << setw(4) << lineno << " : ";
+        if (!strcmp(quad->op, "LDI") || !strcmp(quad->op, "LD")) cout << quad->op << "  " << quad->arg1 << " " << quad->result << endl;
+        else if (!strcmp(quad->op, "ST")) cout << quad->op << " " << quad->result << " " << quad->arg1 << endl;
+        else if (!strcmp(quad->op, "JMP")) cout << quad->op << " " << quad->result << endl;
+        else if (quad->op[0] == 'J') cout << quad->op << " " << quad->arg1 << " " << quad->arg2 << " " << quad->result << endl;
+        else cout << quad->op << " " << quad->result << " " << quad->arg1 << " " << quad->arg2 << endl;
+        quad = quad->next;
+        lineno++;
+    }
+    cout << endl;
+    cout << setw(4) << lineno << " :" << endl;
+    return;
+}
+
 void yyerror(const char* s)
 {
     int line = yylineno;
     cerr << "!!! ERROR: " << s << " at line " << line << endl;
     return;
 }
+
 int main(int argc, char *argv[])
 {
     yyin = stdin;
@@ -181,26 +228,40 @@ int main(int argc, char *argv[])
         if (!file) exit(1);
         yyin = file;
     }
-    else 
+    else
     {
-        cout 
-        cout << "Usage: " << argv[0] << " <input_file> [N]" << endl;
+        cout << "No input file provided." << endl;
+        cout << "Provide input file name and N (number of registers, optional) as command line arguments." << endl;
+        cout << "Usage: " << argv[0] << " <input_file> [N = 5]" << endl;
         exit(1);
     }
 
-    int N = 5; 
-    if (argc > 2)
-    if (argc > 2) N = atoi(argv[2]);
-
-
-    freopen("intermediate.out", "w", stdout);
     __GLOBAL_SYMBOL_TABLE__ = init_ST();
     __GLOBAL_QUAD_TABLE__ = init_QT();
+    __TARGET_CODE_TABLE__ = init_QT();
+
+    if (argc > 2) NUM_REG = atoi(argv[2]);
+    freopen("intermediate.out", "w", stdout);
+    cout << sep << "\nIntermediate Code " << endl;
+    cout << sep2 << "\nSource File: " << argv[1] << endl;
+    cout << "Generated at: " << __DATE__ << ", " << __TIME__ << endl;
+    cout << sep << endl;
     yyparse();
-    gen_blocks();
+    BLOCK_NUM = 0; gen_blocks();
     printQT();
 
-    freopen("target.out", "w", stdout);
+    memset(target_code, 0, 1024 * 10 * sizeof(int));
+    memset(correlation, -1, 2024 * sizeof(int));
 
+    freopen("target.out", "w", stdout);
+    cout << sep << "\nTarget Code " << endl;
+    cout << sep2 <<  "\nSource File: " << argv[1] << endl;
+    cout << "Generated at: " << __DATE__ << ", " << __TIME__ << endl;
+    cout << sep << endl;
+    
+    target_code_generator();
+    BLOCK_NUM = 1; gen_blocks2();
+    ASSEMBLY_CNT = 0;
+    printTC();
     return 0;
 }

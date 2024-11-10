@@ -1,0 +1,86 @@
+================================================================================
+Target Code 
+--------------------------------------------------------------------------------
+Source File: input.txt
+Generated at: Nov 10 2024, 21:40:33
+================================================================================
+
+Block 1
+   1 : LDI  R1 0
+   2 : LDI  R2 2024
+   3 : ST n R1
+   4 : ST x R2
+
+Block 2
+   5 : LD  R1 x
+   6 : JEQ R1 1 24
+
+Block 3
+   7 : LD  R1 x
+   8 : REM R2 R1 2
+   9 : JNE R2 1 17
+
+Block 4
+  10 : LD  R1 x
+  11 : MUL R2 3 R1
+  12 : ADD R3 R2 1
+  13 : LD  R4 n
+  14 : ADD R5 R4 1
+  15 : ST n R5
+  16 : ST x R3
+
+Block 5
+  17 : LD  R1 x
+  18 : DIV R2 R1 2
+  19 : LD  R3 n
+  20 : ADD R4 R3 1
+  21 : ST n R4
+  22 : ST x R2
+  23 : JMP 5
+
+Block 6
+  24 : LD  R1 n
+  25 : JNE R1 0 28
+
+Block 7
+  26 : LDI  R1 0
+  27 : ST F R1
+
+Block 8
+  28 : LD  R1 n
+  29 : JNE R1 1 32
+
+Block 9
+  30 : LDI  R1 1
+  31 : ST F R1
+
+Block 10
+  32 : LD  R1 n
+  33 : JLT R1 2 53
+
+Block 11
+  34 : LDI  R1 2
+  35 : LDI  R2 1
+  36 : LDI  R3 0
+  37 : ST m R1
+  38 : ST Fprev1 R2
+  39 : ST Fprev2 R3
+
+Block 12
+  40 : LD  R1 m
+  41 : LD  R2 n
+  42 : JGT R1 R2 53
+
+Block 13
+  43 : LD  R1 Fprev1
+  44 : LD  R2 Fprev2
+  45 : ADD R3 R1 R2
+  46 : LD  R4 m
+  47 : ADD R5 R4 1
+  48 : ST F R3
+  49 : ST m R5
+  50 : ST Fprev1 R3
+  51 : ST Fprev2 R1
+  52 : JMP 40
+
+  53 :

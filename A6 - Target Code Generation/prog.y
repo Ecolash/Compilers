@@ -22,6 +22,7 @@
         bool type; 
         int size;
         int offset;
+        char* locations[10];
         sPtr next;
     };
 
@@ -42,16 +43,16 @@
 
     STPtr __GLOBAL_SYMBOL_TABLE__;
     QTPtr __GLOBAL_QUAD_TABLE__;
+    QTPtr __TARGET_CODE_TABLE__;
     int QUAD_CNT = 0;
     int TEMP_CNT = 0;
     int OFFSET = 0;
     int BLOCK_NUM = 0;
-    int block[1 << 15] = {0};
 
     STPtr init_ST();
     QTPtr init_QT();
-    sPtr init(char *name, int type, int size, int offset);
-    qPtr init(int idx, char* op, char* arg1, char* arg2, char* result);
+    sPtr init_symbol(char *name, int type, int size, int offset);
+    qPtr init(char* op, char* arg1, char* arg2, char* result);
 
     int getQTSize();
     int nextinstr();
@@ -165,7 +166,7 @@
             char* num = new char[10];
             sPtr temp = new Symbol();
             sprintf(num, "%d", $1);
-            $$ = init(num, 0, 4, -1);
+            $$ = init_symbol(num, 0, 4, -1);
         }
         | EXPR { $$ = $1; }
         ;
