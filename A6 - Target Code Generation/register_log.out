@@ -1,0 +1,96 @@
+==================================================
+REGISTER LOG (LOAD & STORE info) 
+--------------------------------------------------
+Source File: input.txt
+Generated at: Nov 12 2024, 01:10:50
+==================================================
+BLOCK 1
+--------------------------------------------------
+| >> | LOADED R[1] with value 0
+| >> | LOADED R[2] with value 2024
+| << | STORED R[1] to memory value n
+| << | STORED R[2] to memory value x
+==================================================
+BLOCK 2
+--------------------------------------------------
+| >> | LOADED R[1] with value x
+==================================================
+BLOCK 3
+--------------------------------------------------
+| >> | LOADED R[1] with value x
+| >> | LOADED R[2] with value $1
+| == | R[2] = R1 % 2
+==================================================
+BLOCK 4
+--------------------------------------------------
+| >> | LOADED R[1] with value x
+| >> | LOADED R[2] with value $2
+| == | R[2] = 3 * R1
+| >> | LOADED R[3] with value $3
+| == | R[3] = R2 + 1
+| >> | LOADED R[4] with value n
+| >> | LOADED R[5] with value $4
+| == | R[5] = R4 + 1
+| << | STORED R[5] to memory value n
+| << | STORED R[3] to memory value x
+==================================================
+BLOCK 5
+--------------------------------------------------
+| >> | LOADED R[1] with value x
+| >> | LOADED R[2] with value $5
+| == | R[2] = R1 / 2
+| >> | LOADED R[3] with value n
+| >> | LOADED R[4] with value $6
+| == | R[4] = R3 + 1
+| << | STORED R[4] to memory value n
+| << | STORED R[2] to memory value x
+==================================================
+BLOCK 6
+--------------------------------------------------
+| >> | LOADED R[1] with value n
+==================================================
+BLOCK 7
+--------------------------------------------------
+| >> | LOADED R[1] with value 0
+| << | STORED R[1] to memory value F
+==================================================
+BLOCK 8
+--------------------------------------------------
+| >> | LOADED R[1] with value n
+==================================================
+BLOCK 9
+--------------------------------------------------
+| >> | LOADED R[1] with value 1
+| << | STORED R[1] to memory value F
+==================================================
+BLOCK 10
+--------------------------------------------------
+| >> | LOADED R[1] with value n
+==================================================
+BLOCK 11
+--------------------------------------------------
+| >> | LOADED R[1] with value 2
+| >> | LOADED R[2] with value 1
+| >> | LOADED R[3] with value 0
+| << | STORED R[1] to memory value m
+| << | STORED R[2] to memory value Fprev1
+| << | STORED R[3] to memory value Fprev2
+==================================================
+BLOCK 12
+--------------------------------------------------
+| >> | LOADED R[1] with value m
+| >> | LOADED R[2] with value n
+==================================================
+BLOCK 13
+--------------------------------------------------
+| >> | LOADED R[1] with value Fprev1
+| >> | LOADED R[2] with value Fprev2
+| >> | LOADED R[3] with value $7
+| == | R[3] = R1 + R2
+| >> | LOADED R[4] with value m
+| >> | LOADED R[5] with value $8
+| == | R[5] = R4 + 1
+| << | STORED R[3] to memory value F
+| << | STORED R[5] to memory value m
+| << | STORED R[3] to memory value Fprev1
+| << | STORED R[1] to memory value Fprev2

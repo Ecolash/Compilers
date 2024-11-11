@@ -14,8 +14,6 @@ extern int OFFSET;
 extern int yylineno;
 extern FILE *yyin;
 
-const string sep = string(80, '=');
-const string sep2 = string(80, '-');
 
 using namespace std;
 
@@ -69,23 +67,23 @@ void gen_blocks()
 void gen_blocks2()
 {
     for (int i = 0; i < 1024; i++)
-    for (int j = 0; j < 10; j++)
-    if (target_code[i][j] != 0)
-    {
-        int label = correlation[i];
-        int idx = target_code[i][j] - 1;
-        if (label == -1) label = ASSEMBLY_CNT + 1;
-        qPtr temp = __TARGET_CODE_TABLE__->head;
-        for (; temp != NULL; temp = temp->next)
+      for (int j = 0; j < 10; j++)
+        if (CONTROL_FLOW[i][j] != 0)
         {
-            if (temp->idx == idx)
+            int curr = __MAP__[i];
+            int idx = CONTROL_FLOW[i][j] - 1;
+            if (curr < 0) curr = ASSEMBLY_CNT + 1;
+            qPtr temp = __TARGET_CODE_TABLE__->head;
+            for (; temp != NULL; temp = temp->next)
             {
-                temp->result = new char[10];
-                sprintf(temp->result, "%d", label + 1);
-                break;
+                if (temp->idx == idx)
+                {
+                    temp->result = new char[10];
+                    sprintf(temp->result, "%d", curr + 1);
+                    break;
+                }
             }
         }
-    }
 }
 
 void insert(char *name, int type, int size, int offset)
@@ -250,8 +248,20 @@ int main(int argc, char *argv[])
     BLOCK_NUM = 0; gen_blocks();
     printQT();
 
-    memset(target_code, 0, 1024 * 10 * sizeof(int));
-    memset(correlation, -1, 2024 * sizeof(int));
+    memset(CONTROL_FLOW, 0, 1024 * 10 * sizeof(int));
+    memset(__MAP__, -1, 2024 * sizeof(int));
+
+    freopen("register_log.out", "w", stdout);
+    cout << sep << "\nREGISTER LOG (LOAD & STORE info) " << endl;
+    cout << sep2 << "\nSource File: " << argv[1] << endl;
+    cout << "Generated at: " << __DATE__ << ", " << __TIME__ << endl;
+    cout << sep << endl;
+
+    BLOCK_NUM = 1;
+    ofstream log("register_log.out", ios::app);
+    log << "BLOCK " << BLOCK_NUM << endl;
+    log << sep2 << endl;
+    log.close();
 
     freopen("target.out", "w", stdout);
     cout << sep << "\nTarget Code " << endl;
