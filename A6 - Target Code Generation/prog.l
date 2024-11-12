@@ -1,3 +1,8 @@
+/*=========================================//
+NAME - TUHIN MONDAL
+ROLL NUMBER - 22CS10087
+//=========================================*/
+
 %{
     #include "y.tab.h"
     extern int yylineno;
@@ -31,8 +36,8 @@ nl          [\n]
 "<="        { yylval.relop = strdup(yytext); return LE; }
 ">="        { yylval.relop = strdup(yytext); return GE; }
 "/="        { yylval.relop = strdup(yytext); return NE; }
-"("         { return LP; }
-")"         { return RP; }
+"("         { return '('; }
+")"         { return ')'; }
 
 
 {num}       { yylval.num = atoi(yytext); return NUMB; }

@@ -1,6 +1,9 @@
+/*=========================================//
+NAME - TUHIN MONDAL
+ROLL NUMBER - 22CS10087
+//=========================================*/
+
 #include <iostream>
-#include <fstream>
-#include <cstring>
 #include <iomanip>
 #include "codegen.h"
 
@@ -13,7 +16,6 @@ extern int QUAD_CNT;
 extern int OFFSET;
 extern int yylineno;
 extern FILE *yyin;
-
 
 using namespace std;
 
@@ -120,6 +122,16 @@ int emit(char *op, char *arg1, char *arg2, char *result)
 {
     qPtr Q0 = init(op, arg1, arg2, result);
     qPtr *temp = &__GLOBAL_QUAD_TABLE__->head;
+    while (*temp != NULL) temp = &(*temp)->next;
+    *temp = Q0;
+    return Q0->idx;
+}
+
+int emit2(char *op, char *arg1, char *arg2, char *result)
+{
+    qPtr Q0 = init(op, arg1, arg2, result);
+    Q0-> idx = (!strcmp(op, "Block"))? ASSEMBLY_CNT : ASSEMBLY_CNT++;
+    qPtr *temp = &__TARGET_CODE_TABLE__->head;
     while (*temp != NULL) temp = &(*temp)->next;
     *temp = Q0;
     return Q0->idx;

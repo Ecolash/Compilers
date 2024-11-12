@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "*.cpp": "cpp",
-        "iostream": "cpp",
-        "iomanip": "cpp",
-        "string": "cpp",
-        "ostream": "cpp"
-    }
-}

@@ -1,3 +1,8 @@
+/*=========================================//
+NAME - TUHIN MONDAL
+ROLL NUMBER - 22CS10087
+//=========================================*/
+
 #ifndef __CODEGEN_H__
 #define __CODEGEN_H__
 
@@ -10,6 +15,7 @@
 
 using namespace std;
 
+int currently_used = -1;
 const string sep = string(50, '=');
 const string sep2 = string(50, '-');
 
@@ -42,16 +48,6 @@ void clear_reg()
     return;
 }
 
-int emit2(char *op, char *arg1, char *arg2, char *result)
-{
-    qPtr Q0 = init(op, arg1, arg2, result);
-    Q0-> idx = (!strcmp(op, "Block"))? ASSEMBLY_CNT : ASSEMBLY_CNT++;
-    qPtr *temp = &__TARGET_CODE_TABLE__->head;
-    while (*temp != NULL) temp = &(*temp)->next;
-    *temp = Q0;
-    return Q0->idx;
-}
-
 bool constant(const char *str)
 {
     if (!str || !*str) return false;
@@ -77,7 +73,7 @@ void load_reg(int reg, const char *arg, int isT, int idx)
     sPtr symb = find(const_cast<char*>(arg));
     char* RT = new char[10];
     sprintf(RT, "%d", reg + 1);
-    symb->locations[1] = RT;
+    symb->ADDRESS_DESCRIPTOR[1] = RT;
     REG_DESCRIPTOR[reg][0] = symb;
 }
 
@@ -85,32 +81,31 @@ int spill()
 {
     int mini = 0, min_score = 1e9, score = 0;
     for (int i = 0; i < 5; i++) {
+        if (i == currently_used) continue;
         for (int j = 0; j < 10; j++) 
         {
             bool updated = false;
             if (REG_DESCRIPTOR[i][j] != NULL) {
                 sPtr symb = find(REG_DESCRIPTOR[i][j]->name);
-                if (symb->locations[0] && !strcmp(symb->locations[0], REG_DESCRIPTOR[i][j]->name)) updated = true;
-                if (symb->locations[1] && !strcmp(symb->locations[1], REG_DESCRIPTOR[i][j]->name)) updated = true;
+                if (symb->ADDRESS_DESCRIPTOR[0] && !strcmp(symb->ADDRESS_DESCRIPTOR[0], REG_DESCRIPTOR[i][j]->name)) updated = true;
+                if (symb->ADDRESS_DESCRIPTOR[1] && !strcmp(symb->ADDRESS_DESCRIPTOR[1], REG_DESCRIPTOR[i][j]->name)) updated = true;
                 score += !updated;
             }
         }   
-        score = min(score, min_score);
-        if (score == min_score) mini = i;
+        if (score < min_score) mini = i, min_score = score;
         score = 0;
     }
-
     for (int j = 0; j < 10; j++) {
         bool updated = false;
         if (REG_DESCRIPTOR[mini][j] != NULL) {
             sPtr symb = find(REG_DESCRIPTOR[mini][j]->name);
-            if (symb->locations[0] && !strcmp(symb->locations[0], REG_DESCRIPTOR[mini][j]->name)) updated = true;
-            if (symb->locations[1] && !strcmp(symb->locations[1], REG_DESCRIPTOR[mini][j]->name)) updated = true;
+            if (symb->ADDRESS_DESCRIPTOR[0] && !strcmp(symb->ADDRESS_DESCRIPTOR[0], REG_DESCRIPTOR[mini][j]->name)) updated = true;
+            if (symb->ADDRESS_DESCRIPTOR[1] && !strcmp(symb->ADDRESS_DESCRIPTOR[1], REG_DESCRIPTOR[mini][j]->name)) updated = true;
             if (updated == false) {
-                char RT[10];
+                char *RT = new char[10];
                 sprintf(RT, "R%d", mini + 1);
                 emit2("ST", RT, NULL, symb->name);
-                symb->locations[0] = symb->name;
+                symb->ADDRESS_DESCRIPTOR[0] = symb->name;
                 ofstream log("register_log.out", ios::app);
                 log << "| << | STORED R[" << mini + 1 << "] to memory value " << symb->name << endl;
                 log.close();
@@ -120,22 +115,26 @@ int spill()
     return mini;
 }
 
-int getReg(const char *arg, const char *res, int t, int idx)
+int get_reg(const char *arg, const char *res, int t, int idx)
 {
     // CHECK - 1
     // ----------------------------------------
-    for (int i = 0; i < 5; i++)
-    for (int j = 0; j < 10; j++)
-    if (REG_DESCRIPTOR[i][j] && !strcmp(REG_DESCRIPTOR[i][j]->name, arg))
-        return i;
+    for (int i = 0; i < 5; i++){
+        if (i == currently_used) continue;
+        for (int j = 0; j < 10; j++)
+        if (REG_DESCRIPTOR[i][j] && !strcmp(REG_DESCRIPTOR[i][j]->name, arg))
+            return i;
+    }
 
     // CHECK - 2
     // ----------------------------------------
-    for (int i = 0; i < 5; i++)
-    if (!REG_DESCRIPTOR[i][0])
-    {
-        load_reg(i, arg, t, idx);
-        return i;
+    for (int i = 0; i < 5; i++){
+        if (i == currently_used) continue;
+        if (!REG_DESCRIPTOR[i][0])
+        {
+            load_reg(i, arg, t, idx);
+            return i;
+        }
     }
 
     // CHECK - 3
@@ -143,14 +142,15 @@ int getReg(const char *arg, const char *res, int t, int idx)
     int updated_reg = 0;
     for (int i = 0; i < 5; i++)
     {
+        if (i == currently_used) continue;
         for (int j = 0; j < 10; j++)
         {
             updated_reg += (REG_DESCRIPTOR[i][j] == NULL);
             if (REG_DESCRIPTOR[i][j])
             {
                 sPtr symb = find(REG_DESCRIPTOR[i][j]->name);
-                if (symb->locations[0] && !strcmp(symb->locations[0], symb->name)) { updated_reg++; }
-                else if (symb->locations[1] && !strcmp(symb->locations[1], symb->name)) { updated_reg++; }
+                if (symb->ADDRESS_DESCRIPTOR[0] && !strcmp(symb->ADDRESS_DESCRIPTOR[0], symb->name)) { updated_reg++; }
+                else if (symb->ADDRESS_DESCRIPTOR[1] && !strcmp(symb->ADDRESS_DESCRIPTOR[1], symb->name)) { updated_reg++; }
             } 
         }
         if (updated_reg == 10) { load_reg(i, arg, t, idx); return i;}
@@ -163,6 +163,7 @@ int getReg(const char *arg, const char *res, int t, int idx)
     {
         for (int i = 0; i < 5; i++)
         {
+            if (i == currently_used) continue;
             for (int j = 0; j < 10; j++)
             if (REG_DESCRIPTOR[i][j])
             {
@@ -187,13 +188,13 @@ void clean(bool log = 1)
     sPtr temp = __GLOBAL_SYMBOL_TABLE__->head;
     while (temp != NULL)
     {
-        if (constant(temp->locations[0]))
+        if (constant(temp->ADDRESS_DESCRIPTOR[0]))
         {
-            int reg_num = atoi(temp->locations[0]);
+            int reg_num = atoi(temp->ADDRESS_DESCRIPTOR[0]);
             char *treg = (char *)malloc(sizeof(char) * 10);
             sprintf(treg, "R%d", reg_num);
             emit2("ST", treg, NULL, temp->name);
-            temp->locations[0] = temp->name;
+            temp->ADDRESS_DESCRIPTOR[0] = temp->name;
             ofstream log("register_log.out", ios::app);
             log << "| << | STORED R[" << reg_num << "] to memory value " << temp->name << endl;
             log.close();
@@ -224,8 +225,8 @@ void target_code_generator(qPtr quad = __GLOBAL_QUAD_TABLE__->head, int cnt = 1)
     {
         char *a = constant(quad->arg1) ? const_cast<char*>(quad->arg1) : new char[10];
         char *b = constant(quad->arg2) ? const_cast<char*>(quad->arg2) : new char[10];
-        if (!constant(quad->arg1)) { Rx = getReg(quad->arg1, quad->result, 0, cnt); sprintf(a, "R%d", Rx + 1);}
-        if (!constant(quad->arg2)) { Ry = getReg(quad->arg2, quad->result, 0, cnt); sprintf(b, "R%d", Ry + 1);}
+        if (!constant(quad->arg1)) { Rx = get_reg(quad->arg1, quad->result, 0, cnt); sprintf(a, "R%d", Rx + 1);}
+        if (!constant(quad->arg2)) { Ry = get_reg(quad->arg2, quad->result, 0, cnt); sprintf(b, "R%d", Ry + 1);}
 
         if (!strcmp(quad->op, "=")) x = emit2("JNE", a, b, NULL);
         else if (!strcmp(quad->op, "/=")) x = emit2("JEQ", a, b, NULL);
@@ -266,7 +267,7 @@ void target_code_generator(qPtr quad = __GLOBAL_QUAD_TABLE__->head, int cnt = 1)
     }
     else if (!strcmp(quad->op, "="))
     {
-        int reg_idx = getReg(quad->arg1, quad->result, 0, cnt);
+        int reg_idx = get_reg(quad->arg1, quad->result, 0, cnt);
         for (int i = 0; i < 10; i++)
         {
             if (REG_DESCRIPTOR[reg_idx][i] == NULL)
@@ -274,7 +275,7 @@ void target_code_generator(qPtr quad = __GLOBAL_QUAD_TABLE__->head, int cnt = 1)
                 sPtr symb = find(const_cast<char*>(quad->result));
                 char *treg = new char[10];
                 sprintf(treg, "%d", reg_idx + 1);
-                symb->locations[0] = treg;
+                symb->ADDRESS_DESCRIPTOR[0] = treg;
                 REG_DESCRIPTOR[reg_idx][i] = symb;
                 break;
             }
@@ -288,25 +289,27 @@ void target_code_generator(qPtr quad = __GLOBAL_QUAD_TABLE__->head, int cnt = 1)
 
         if (!constant(quad->arg1))
         {
-            int reg_idx1 = getReg(quad->arg1, quad->result, 0, cnt);
+            int reg_idx1 = get_reg(quad->arg1, quad->result, 0, cnt);
+            currently_used = reg_idx1;
             sprintf(a, "R%d", reg_idx1 + 1);
         }
 
         if (!constant(quad->arg2))
         {
-            int reg_idx2 = getReg(quad->arg2, quad->result, 0, cnt);
+            int reg_idx2 = get_reg(quad->arg2, quad->result, 0, cnt);
+            currently_used = -1;
             sprintf(b, "R%d", reg_idx2 + 1);
         }
 
-        int reg_idx = getReg(quad->result, quad->result, 1, cnt);
+        int reg_idx = get_reg(quad->result, quad->result, 1, cnt);
         sPtr symb = find(const_cast<char*>(quad->result));
         REG_DESCRIPTOR[reg_idx][0] = symb;
         for (int i = 1; i < 10; i++) REG_DESCRIPTOR[reg_idx][i] = NULL;
 
         char *c = new char[10];
         sprintf(c, "R%d", reg_idx + 1);
-        symb->locations[0] = c;
-        symb->locations[1] = NULL;
+        symb->ADDRESS_DESCRIPTOR[0] = c;
+        symb->ADDRESS_DESCRIPTOR[1] = NULL;
         if (!strcmp(quad->op, "+") || !strcmp(quad->op, "-") || !strcmp(quad->op, "*") || !strcmp(quad->op, "/") || !strcmp(quad->op, "%"))
         {
             char* ops[] = {"ADD", "SUB", "MUL", "DIV", "REM"};

@@ -1,8 +1,12 @@
 %{
+/*=========================================//
+NAME - TUHIN MONDAL
+ROLL NUMBER - 22CS10087
+//=========================================*/
+
     #include <iostream>
     #include <cstdlib>
     #include <cstring>
-    #include <cstdio>
 
     int yylex();
     void yyerror(const char* s);
@@ -22,7 +26,7 @@
         bool type; 
         int size;
         int offset;
-        char* locations[10];
+        char* ADDRESS_DESCRIPTOR[10];
         sPtr next;
     };
 
@@ -60,7 +64,7 @@
     void backpatch(int idx, int instr);
     void insert(char* name, int type, int size, int offset);
     int emit(char* op, char* arg1, char* arg2, char* result);
-    
+    int emit2(char* op, char* arg1, char* arg2, char* result);
 %}
 
 %union {
@@ -83,7 +87,7 @@
 %token <keyword> set when loop WHILE
 %token <op> ADD SUB MUL DIV MOD
 %token <relop> EQ LT GT LE GE NE
-%token <punc> LP RP
+%token <punc> '(' ')'
 
 %%
     START: LIST;
@@ -115,20 +119,20 @@
     M:  { $$ = nextinstr(); };
 
 
-    ASGN: LP set IDEN ATOM RP {
+    ASGN: '(' set IDEN ATOM ')' {
             if (find($3) == NULL) insert($3, 1, sizeof($3), OFFSET);
             OFFSET += sizeof($3);
             emit((char*)"=", $4->name, NULL, find($3)->name);
         }
         ;
 
-    COND: LP when BOOL LIST M RP {
+    COND: '(' when BOOL LIST M ')' {
             backpatch($3.falselist, $5); 
             $$ = $4;
         }
         ;
 
-    LOOP: LP loop WHILE M BOOL LIST M RP {
+    LOOP: '(' loop WHILE M BOOL LIST M ')' {
             char* instr = new char[10];
             sprintf(instr, "%d", $4);
             emit((char*)"goto", NULL, NULL, instr);
@@ -138,7 +142,7 @@
         }
         ;
 
-    EXPR: LP OPER ATOM ATOM RP {
+    EXPR: '(' OPER ATOM ATOM ')' {
             char* temp = new char[10];
             sprintf(temp, "$%d", ++TEMP_CNT);
             insert(temp, 0, 4, OFFSET);
@@ -149,7 +153,7 @@
         }
         ;
 
-    BOOL: LP RELN ATOM ATOM RP {
+    BOOL: '(' RELN ATOM ATOM ')' {
             emit($2, $3->name, $4->name, (char*)"if");
             $$.falselist = emit((char*)"goto", NULL, NULL, (char*)"-1");
         }
